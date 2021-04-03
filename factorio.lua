@@ -113,6 +113,13 @@ for value, name in pairs(NetworkMessageType) do
 	NetworkMessageTypeEnum[name] = value
 end
 
+-- For some weird reason connection requests include the
+-- message id even though they don't have the fragmented flag set
+always_has_message_id_types = {
+	[NetworkMessageTypeEnum.ConnectionRequest] = true,
+	[NetworkMessageTypeEnum.ConnectionRequestReplyConfirm] = true,
+}
+
 
 pf.flags = ProtoField.uint8("fgp.header.flags", "Flags", base.HEX, nil, 0, "NetworkHeader flags")
 
@@ -139,6 +146,7 @@ fe.frag_number = "fgp.header.fragment_number"
 pf.confirm_count = ProtoField.uint8("fgp.header.confirm_count", "Confirm count", base.DEC, nil, 0)
 pf.confirm_item  = ProtoField.bytes("fgp.header.confirm_item", "Confirm Data", base.SPACE)
 
+
 function dissect_network_message_header(pos, tvbuf, pktinfo, tree)
 	local start_pos = pos
 	local pktlen = tvbuf:reported_length_remaining()
@@ -160,7 +168,10 @@ function dissect_network_message_header(pos, tvbuf, pktinfo, tree)
 
 	pktinfo.cols.info:set(NetworkMessageType[fe.message_type()()] or "Unknown")
 
-	if fe.fragmented()() then
+	local msg_type = fe.message_type()()
+	local fragmented = fe.fragmented()()
+
+	if fragmented or always_has_message_id_types[msg_type] then
 		if pktlen < 4 then
 			pktinfo.cols.info:append("[Too short] ")
 			header_tree:add_proto_expert_info(
@@ -174,8 +185,10 @@ function dissect_network_message_header(pos, tvbuf, pktinfo, tree)
 		header_tree:add_le(pf.confirm, tvbuf:range(pos, 2))
 		pos = pos + 2
 
-		header_tree:add(pf.frag_number, tvbuf:range(pos, 1))
-		pos = pos + 1
+		if fragmented then
+			header_tree:add(pf.frag_number, tvbuf:range(pos, 1))
+			pos = pos + 1
+		end
 
 		if fe.confirm()() then
 			header_tree:add(pf.confirm_count, tvbuf:range(pos, 1))
@@ -210,12 +223,20 @@ function dissect_network_message(pos, tvbuf, pktinfo, tree)
 
 	-- Ping
 	-- PingReply
-	-- ConnectionRequest
-	-- ConnectionRequestReply
-	-- ConnectionRequestReplyConfirm
-	-- ConnectionAcceptOrDeny
 
-	if msg_type == NetworkMessageTypeEnum.ClientToServerHeartbeat then
+	if msg_type == NetworkMessageTypeEnum.ConnectionRequest then
+		pos = dissect_connection_request(pos, tvbuf, pktinfo, msg_tree)
+
+	elseif msg_type == NetworkMessageTypeEnum.ConnectionRequestReply then
+		pos = dissect_connection_request_reply(pos, tvbuf, pktinfo, msg_tree)
+
+	elseif msg_type == NetworkMessageTypeEnum.ConnectionRequestReplyConfirm then
+		pos = dissect_connection_request_reply_confirm(pos, tvbuf, pktinfo, msg_tree)
+
+	elseif msg_type == NetworkMessageTypeEnum.ConnectionAcceptOrDeny then
+		pos = dissect_connection_accept_or_deny(pos, tvbuf, pktinfo, msg_tree)
+
+	elseif msg_type == NetworkMessageTypeEnum.ClientToServerHeartbeat then
 		pos = dissect_heartbeat(pos, tvbuf, pktinfo, msg_tree, false)
 
 	elseif msg_type == NetworkMessageTypeEnum.ServerToClientHeartbeat then
@@ -249,6 +270,359 @@ function dissect_network_message(pos, tvbuf, pktinfo, tree)
 	end
 end
 
+
+pf.connection_request_major_ver = ProtoField.uint8("fgp.connection_request.version.major", "major", base.DEC, nil, 0)
+pf.connection_request_minor_ver = ProtoField.uint8("fgp.connection_request.version.minor", "minor", base.DEC, nil, 0)
+pf.connection_request_patch_ver = ProtoField.uint8("fgp.connection_request.version.patch", "patch", base.DEC, nil, 0)
+pf.connection_request_build_ver = ProtoField.uint16("fgp.connection_request.version.build", "build", base.DEC, nil, 0)
+pf.connection_request_client_id = ProtoField.uint32(
+	"fgp.connection_request.connection_request_id_generated_on_client", "connectionRequestIDGeneratedOnClient", base.HEX, nil, 0
+)
+
+function dissect_connection_request(pos, tvbuf, pktinfo, tree)
+	local version =
+		tvbuf:range(pos, 1):uint() .. "." ..
+		tvbuf:range(pos + 1, 1):uint() .. "." ..
+		tvbuf:range(pos + 2, 1):uint() ..
+		" (build " .. tvbuf:range(pos + 3, 2):le_uint() .. ")"
+
+	local ver_tree = tree:add(tvbuf:range(pos, 5), "clientApplicationVersion: " .. version)
+	ver_tree:add(pf.connection_request_major_ver, tvbuf:range(pos, 1))
+	pos = pos + 1
+	ver_tree:add(pf.connection_request_major_ver, tvbuf:range(pos, 1))
+	pos = pos + 1
+	ver_tree:add(pf.connection_request_major_ver, tvbuf:range(pos, 1))
+	pos = pos + 1
+	ver_tree:add_le(pf.connection_request_build_ver, tvbuf:range(pos, 2))
+	pos = pos + 2
+
+	tree:add_le(pf.connection_request_client_id, tvbuf:range(pos, 4))
+	pos = pos + 4
+	return pos
+end
+
+pf.connection_reply_major_ver = ProtoField.uint8("fgp.connection_request_reply.version.major", "major", base.DEC, nil, 0)
+pf.connection_reply_minor_ver = ProtoField.uint8("fgp.connection_request_reply.version.minor", "minor", base.DEC, nil, 0)
+pf.connection_reply_patch_ver = ProtoField.uint8("fgp.connection_request_reply.version.patch", "patch", base.DEC, nil, 0)
+pf.connection_reply_build_ver = ProtoField.uint16("fgp.connection_request_reply.version.build", "build", base.DEC, nil, 0)
+pf.connection_reply_client_id = ProtoField.uint32(
+	"fgp.connection_request_reply.connection_request_id_generated_on_client", "connectionRequestIDGeneratedOnClient", base.HEX, nil, 0
+)
+pf.connection_reply_server_id = ProtoField.uint32(
+	"fgp.connection_request_reply.connection_request_id_generated_on_server", "connectionRequestIDGeneratedOnServer", base.HEX, nil, 0
+)
+
+function dissect_connection_request_reply(pos, tvbuf, pktinf, tree)
+	local version =
+		tvbuf:range(pos, 1):uint() .. "." ..
+		tvbuf:range(pos + 1, 1):uint() .. "." ..
+		tvbuf:range(pos + 2, 1):uint() ..
+		" (build " .. tvbuf:range(pos + 3, 2):le_uint() .. ")"
+
+	local ver_tree = tree:add(tvbuf:range(pos, 5), "serverApplicationVersion: " .. version)
+	ver_tree:add(pf.connection_reply_major_ver, tvbuf:range(pos, 1))
+	pos = pos + 1
+	ver_tree:add(pf.connection_reply_major_ver, tvbuf:range(pos, 1))
+	pos = pos + 1
+	ver_tree:add(pf.connection_reply_major_ver, tvbuf:range(pos, 1))
+	pos = pos + 1
+	ver_tree:add_le(pf.connection_reply_build_ver, tvbuf:range(pos, 2))
+	pos = pos + 2
+
+	tree:add_le(pf.connection_reply_client_id, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	tree:add_le(pf.connection_reply_server_id, tvbuf:range(pos, 4))
+	pos = pos + 4
+	return pos
+end
+
+-- ModID
+pf.mod_id_name_length = ProtoField.uint32("fgp.mod_id.name.length", "length", base.DEC, nil, 0)
+pf.mod_id_name_data = ProtoField.string("fgp.mod_id.name.data", "data", base.ASCII)
+pf.mod_id_version_major = ProtoField.uint16("fgp.mod_id.version.major_version", "majorVersion", base.DEC, nil, 0)
+pf.mod_id_version_minor = ProtoField.uint16("fgp.mod_id.version.minor_version", "minorVersion", base.DEC, nil, 0)
+pf.mod_id_version_sub = ProtoField.uint16("fgp.mod_id.version.sub_version", "subVersion", base.DEC, nil, 0)
+pf.mod_id_crc = ProtoField.uint32("fgp.mod_id.crc", "crc", base.DEC, nil, 0)
+
+function dissect_mod_id(pos, tvbuf, pktinfo, tree)
+	local start_pos = pos
+	local mod_tree = tree:add(tvbuf:range(pos), "ModID")
+	local name
+	pos, name = decode_string(pos, tvbuf, mod_tree, "name", "mod_id_name")
+
+	local ver_tree = mod_tree:add(tvbuf:range(pos), "version")
+	local major_range, major_ver
+	pos, major_range, major_ver = decode_uint16v(pos, tvbuf)
+	ver_tree:add(pf.mod_id_version_major, major_range, major_ver)
+
+	local minor_range, minor_ver
+	pos, minor_range, minor_ver = decode_uint16v(pos, tvbuf)
+	ver_tree:add(pf.mod_id_version_minor, minor_range, minor_ver)
+
+	local sub_range, sub_ver
+	pos, sub_range, sub_ver = decode_uint16v(pos, tvbuf)
+	ver_tree:add(pf.mod_id_version_sub, sub_range, sub_ver)
+	local version = major_ver .. "." .. minor_ver .. "." .. sub_ver
+	ver_tree:append_text(": " .. version)
+
+	mod_tree:add_le(pf.mod_id_crc, tvbuf:range(pos, 4))
+	pos = pos + 4
+	mod_tree.len = pos - start_pos
+
+	mod_tree:append_text(": " .. name .. " " .. version)
+	return pos
+end
+
+pf.connection_confirm_client_id = ProtoField.uint32(
+	"fgp.connection_request_reply_confirm.connection_request_id_generated_on_client", "connectionRequestIDGeneratedOnClient", base.HEX, nil, 0
+)
+pf.connection_confirm_server_id = ProtoField.uint32(
+	"fgp.connection_request_reply_confirm.connection_request_id_generated_on_server", "connectionRequestIDGeneratedOnServer", base.HEX, nil, 0
+)
+pf.connection_confirm_instance_id = ProtoField.uint32("fgp.connection_request_reply_confirm.instance_id", "instanceID", base.DEC, nil, 0)
+pf.connection_confirm_username_length = ProtoField.uint32("fgp.connection_request_reply_confirm.username.length", "length", base.DEC, nil, 0)
+pf.connection_confirm_username_data = ProtoField.string("fgp.connection_request_reply_confirm.username.data", "data", base.ASCII)
+pf.connection_confirm_password_hash_length = ProtoField.uint32("fgp.connection_request_reply_confirm.password_hash.length", "length", base.DEC, nil, 0)
+pf.connection_confirm_password_hash_data = ProtoField.string("fgp.connection_request_reply_confirm.password_hash.data", "data", base.ASCII)
+pf.connection_confirm_server_key_length = ProtoField.uint32("fgp.connection_request_reply_confirm.server_key.length", "length", base.DEC, nil, 0)
+pf.connection_confirm_server_key_data = ProtoField.string("fgp.connection_request_reply_confirm.server_key.data", "data", base.ASCII)
+pf.connection_confirm_server_key_time_length = ProtoField.uint32("fgp.connection_request_reply_confirm.server_key_timestamp.length", "length", base.DEC, nil, 0)
+pf.connection_confirm_server_key_time_data = ProtoField.string("fgp.connection_request_reply_confirm.server_key_timestamp.data", "data", base.ASCII)
+pf.connection_confirm_core_checksum = ProtoField.uint32("fgp.connection_request_reply_confirm.core_checksum", "coreChecksum", base.DEC, nil, 0)
+pf.connection_confirm_prototype_list_checksum = ProtoField.uint32("fgp.connection_request_reply_confirm.prototype_list_checksum", "prototypeListChecksum", base.DEC, nil, 0)
+pf.connection_confirm_active_mods_size = ProtoField.uint32("fgp.connection_request_reply_confirm.active_mods.size", "size", base.DEC, nil, 0)
+
+
+function dissect_connection_request_reply_confirm(pos, tvbuf, pktinf, tree)
+	tree:add_le(pf.connection_confirm_client_id, tvbuf:range(pos, 4))
+	pos = pos + 4
+	tree:add_le(pf.connection_confirm_server_id, tvbuf:range(pos, 4))
+	pos = pos + 4
+	tree:add_le(pf.connection_confirm_instance_id, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	pos = decode_string(pos, tvbuf, tree, "username", "connection_confirm_username")
+	pos = decode_string(pos, tvbuf, tree, "passwordHash", "connection_confirm_password_hash")
+	pos = decode_string(pos, tvbuf, tree, "serverKey", "connection_confirm_server_key")
+	pos = decode_string(pos, tvbuf, tree, "serverKeyTimestamp", "connection_confirm_server_key_time")
+
+	tree:add_le(pf.connection_confirm_core_checksum, tvbuf:range(pos, 4))
+	pos = pos + 4
+	tree:add_le(pf.connection_confirm_prototype_list_checksum, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	local mods_size = tvbuf:range(pos, 1):uint()
+	local mods_start_pos = pos
+	local mods_tree = tree:add(tvbuf:range(pos), "activeMods")
+	mods_tree:add(pf.connection_confirm_active_mods_size, tvbuf:range(pos, 1))
+	pos = pos + 1
+
+	for _=1, mods_size do
+		pos = dissect_mod_id(pos, tvbuf, pktinfo, mods_tree)
+	end
+	mods_tree.len = pos - mods_start_pos
+
+	-- TODO: startupModSettings
+
+	return pos
+end
+
+-- ClientsPeerInfo
+pf.clients_info_username_length = ProtoField.uint32("fgp.clients_peer_info.server_username.length", "length", base.DEC, nil, 0)
+pf.clients_info_username_data = ProtoField.string("fgp.clients_peer_info.server_username.data", "data", base.ASCII)
+pf.clients_info_map_saving_progress = ProtoField.uint8("fpg.clients_peer_info.map_saving_progress", "mapSavingProgress", base.DEC, nil, 0)
+pf.clients_info_saving_for_size = ProtoField.uint8("fpg.clients_peer_info.saving_for.size", "size", base.DEC, nil, 0)
+pf.clients_info_saving_for_item = ProtoField.uint16("fgp.clients_peer_info.saving_for.item", "item", base.DEC, nil, 0)
+pf.clients_info_client_size = ProtoField.uint32("fpg.clients_peer_info.client_peer_info.size", "size", base.DEC, nil, 0)
+pf.clients_info_client_first = ProtoField.uint16("fgp.clients_peer_info.client_peer_info.first", "first", base.DEC, nil, 0)
+
+pf.clients_info_client_username_length = ProtoField.uint32("fgp.clients_peer_info.client_peer_info.username.length", "length", base.DEC, nil, 0)
+pf.clients_info_client_username_data = ProtoField.string("fgp.clients_peer_info.client_peer_info.username.data", "data", base.ASCII)
+
+pf.clients_info_client_flags = ProtoField.uint8("fgp.clients_peer_info.client_peer_info.flags", "flags", base.HEX, nil, 0)
+pf.clients_info_client_bit0_flag = ProtoField.bool("fgp.clients_peer_info.client_peer_info.bit0_flag", "bit0", 8, nil, 0x01)
+pf.clients_info_client_bit1_flag = ProtoField.bool("fgp.clients_peer_info.client_peer_info.bit1_flag", "bit1", 8, nil, 0x02)
+pf.clients_info_client_bit2_flag = ProtoField.bool("fgp.clients_peer_info.client_peer_info.bit2_flag", "bit2", 8, nil, 0x04)
+pf.clients_info_client_bit3_flag = ProtoField.bool("fgp.clients_peer_info.client_peer_info.bit3_flag", "bit3", 8, nil, 0x08)
+pf.clients_info_client_bit4_flag = ProtoField.bool("fgp.clients_peer_info.client_peer_info.bit4_flag", "bit4", 8, nil, 0x10)
+pf.clients_info_client_bit5_flag = ProtoField.bool("fgp.clients_peer_info.client_peer_info.bit5_flag", "bit5", 8, nil, 0x20)
+pf.clients_info_client_bit6_flag = ProtoField.bool("fgp.clients_peer_info.client_peer_info.bit6_flag", "bit6", 8, nil, 0x40)
+pf.clients_info_client_bit7_flag = ProtoField.bool("fgp.clients_peer_info.client_peer_info.bit7_flag", "bit7", 8, nil, 0x80)
+-- These are the likely meanings of the flags
+-- NON_DEFAULT_DROPPING_PROGRESS_VALUE -> droppingProgress
+-- NON_DEFAULT_MAP_SAVING_PROGRESS_VALUE -> mapSavingProgress
+-- NON_DEFAULT_MAP_DOWNLOADING_PROGRESS_VALUE -> mapDownloadingProgress
+-- NON_DEFAULT_MAP_LOADING_PROGRESS_VALUE -> mapLoadingProgress
+-- NON_DEFAULT_CATCHUP_PROGRESS_VALUE -> tryingToCatchUpProgress
+
+pf.clients_info_client_progress = ProtoField.uint8("fpg.clients_peer_info.client_peer_info.progress_value", "progress", base.DEC, nil, 0)
+
+function dissect_clients_peer_info(pos, tvbuf, pktinfo, tree)
+	pos = decode_string(pos, tvbuf, tree, "serverUsername", "clients_info_username")
+
+	tree:add(pf.clients_info_map_saving_progress, tvbuf:range(pos, 1))
+	pos = pos + 1
+
+	local saving_start_pos = pos
+	local saving_size = tvbuf:range(pos, 1):uint()
+	local saving_tree = tree:add(tvbuf:range(pos), "savingFor")
+	saving_tree:add(pf.clients_info_saving_for_size, tvbuf:range(pos, 1))
+	pos = pos + 1
+
+	for _=1, saving_size do
+		local item_range, item_value
+		pos, item_range, item_value = decode_uint16v(pos, tvbuf)
+		saving_tree:add(pf.clients_info_saving_for_item, item_range, item_value)
+	end
+	saving_tree.len = pos - saving_start_pos
+
+	local client_start_pos = pos
+	local client_tree = tree:add(tvbuf:range(pos), "clientPeerInfo")
+	local client_size_range, client_size
+	pos, client_size_range, client_size = decode_uint32v(pos, tvbuf)
+	client_tree:add(pf.clients_info_client_size, client_size_range, client_size)
+
+	for _=1, client_size do
+		local entry_start_pos = pos
+		local first_range, first_value
+		pos, first_range, first_value = decode_uint16v(pos, tvbuf)
+		local entry_tree = client_tree:add(tvbuf:range(pos), "entry: " .. first_value)
+		entry_tree:add(pf.clients_info_client_first, first_range, first_value)
+
+		pos = decode_string(pos, tvbuf, entry_tree, "username", "clients_info_client_username")
+
+		local flags_range = tvbuf:range(pos, 1)
+		local client_flags_tree = entry_tree:add(pf.clients_info_client_flags, flags_range)
+		pos = pos + 1
+
+		client_flags_tree:add(pf.clients_info_client_bit0_flag, flags_range)
+		client_flags_tree:add(pf.clients_info_client_bit1_flag, flags_range)
+		client_flags_tree:add(pf.clients_info_client_bit2_flag, flags_range)
+		client_flags_tree:add(pf.clients_info_client_bit3_flag, flags_range)
+		client_flags_tree:add(pf.clients_info_client_bit4_flag, flags_range)
+		client_flags_tree:add(pf.clients_info_client_bit5_flag, flags_range)
+		client_flags_tree:add(pf.clients_info_client_bit6_flag, flags_range)
+		client_flags_tree:add(pf.clients_info_client_bit7_flag, flags_range)
+
+		local flags_value = flags_range:uint()
+		if bit32.band(flags_value, 0x01) ~= 0 then
+			entry_tree:add(pf.clients_info_client_progress, tvbuf:range(pos, 1))
+			pos = pos + 1
+		end
+
+		if bit32.band(flags_value, 0x02) ~= 0 then
+			entry_tree:add(pf.clients_info_client_progress, tvbuf:range(pos, 1))
+			pos = pos + 1
+		end
+
+		if bit32.band(flags_value, 0x04) ~= 0 then
+			entry_tree:add(pf.clients_info_client_progress, tvbuf:range(pos, 1))
+			pos = pos + 1
+		end
+
+		if bit32.band(flags_value, 0x08) ~= 0 then
+			entry_tree:add(pf.clients_info_client_progress, tvbuf:range(pos, 1))
+			pos = pos + 1
+		end
+
+		if bit32.band(flags_value, 0x10) ~= 0 then
+			entry_tree:add(pf.clients_info_client_progress, tvbuf:range(pos, 1))
+			pos = pos + 1
+		end
+
+		entry_tree.len = pos - entry_start_pos
+	end
+	client_tree.len = pos - client_start_pos
+	return pos
+end
+
+
+local ConnectionRequestStatus = {
+	[0] = 'Valid',
+	[1] = 'ModsMismatch',
+	[2] = 'CoreModMismatch',
+	[3] = 'ModStartupSettingMismatch',
+	[4] = 'PrototypeChecksumMismatch',
+	[5] = 'PlayerLimitReached',
+	[6] = 'PasswordMissing',
+	[7] = 'PasswordMismatch',
+	[8] = 'UserVerificationMissing',
+	[9] = 'UserVerificationTimeout',
+	[10] = 'UserVerificationMismatch',
+	[11] = 'UserBanned',
+	[12] = 'AddressUsedForDifferentPlayer',
+	[13] = 'UserWithThatNameAlreadyInGame',
+	[14] = 'UserNotWhitelisted',
+}
+
+pf.connection_accept_client_id = ProtoField.uint32(
+	"fgp.connection_accept_or_deny.connection_request_id_generated_on_client", "connectionRequestIDGeneratedOnClient", base.HEX, nil, 0
+)
+pf.connection_accept_status = ProtoField.uint8("fpg.connection_accept_or_deny.status", "status", base.DEC, ConnectionRequestStatus, 0)
+pf.connection_accept_game_name_length = ProtoField.uint32("fgp.connection_accept_or_deny.game_name.length", "length", base.DEC, nil, 0)
+pf.connection_accept_game_name_data = ProtoField.string("fgp.connection_accept_or_deny.game_name.data", "data", base.ASCII)
+pf.connection_accept_server_hash_length = ProtoField.uint32("fgp.connection_accept_or_deny.server_hash.length", "length", base.DEC, nil, 0)
+pf.connection_accept_server_hash_data = ProtoField.string("fgp.connection_accept_or_deny.server_hash.data", "data", base.ASCII)
+pf.connection_accept_description_length = ProtoField.uint32("fgp.connection_accept_or_deny.description.length", "length", base.DEC, nil, 0)
+pf.connection_accept_description_data = ProtoField.string("fgp.connection_accept_or_deny.description.data", "data", base.ASCII)
+pf.connection_accept_latency = ProtoField.uint8("fpg.connection_accept_or_deny.latency", "latency", base.DEC, nil, 0)
+pf.connection_accept_game_id = ProtoField.uint32("fpg.connection_accept_or_deny.game_id", "gameID", base.DEC, nil, 0)
+pf.connection_accept_steam_id = ProtoField.uint64("fpg.connection_accept_or_deny.steam_id", "steamID", base.DEC, nil, 0)
+pf.connection_accept_expect_seq = ProtoField.uint32("fgp.connection_accept_or_deny.first_sequence_number_to_expect", "firstSequenceNumberToExpect", base.DEC, nil, 0)
+pf.connection_accept_send_seq = ProtoField.uint32("fgp.connection_accept_or_deny.first_sequence_number_to_send", "firstSequenceNumberToSend", base.DEC, nil, 0)
+pf.connection_accept_new_peer_id = ProtoField.uint16("fgp.connection_accept_or_deny.new_peer_id", "newPeerID", base.DEC, nil, 0)
+pf.connection_accept_active_mods_size = ProtoField.uint32("fgp.connection_accept_or_deny.active_mods.size", "size", base.DEC, nil, 0)
+
+function dissect_connection_accept_or_deny(pos, tvbuf, pktinf, tree)
+	tree:add_le(pf.connection_accept_client_id, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	tree:add(pf.connection_accept_status, tvbuf:range(pos, 1))
+	pos = pos + 1
+
+	pos = decode_string(pos, tvbuf, tree, "gameName", "connection_accept_game_name")
+	pos = decode_string(pos, tvbuf, tree, "serverHash", "connection_accept_server_hash")
+	pos = decode_string(pos, tvbuf, tree, "description", "connection_accept_description")
+
+	tree:add(pf.connection_accept_latency, tvbuf:range(pos, 1))
+	pos = pos + 1
+
+	tree:add_le(pf.connection_accept_game_id, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	tree:add_le(pf.connection_accept_steam_id, tvbuf:range(pos, 8))
+	pos = pos + 8
+
+	local peer_start = pos
+	local peer_tree = tree:add(tvbuf:range(pos), "clientsPeerInfo")
+	pos = dissect_clients_peer_info(pos, tvbuf, pktinfo, peer_tree)
+	peer_tree.len = pos - peer_start
+
+	tree:add_le(pf.connection_accept_expect_seq, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	tree:add_le(pf.connection_accept_send_seq, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	tree:add_le(pf.connection_accept_new_peer_id, tvbuf:range(pos, 2))
+	pos = pos + 2
+
+	local mods_size = tvbuf:range(pos, 1):uint()
+	local mods_start_pos = pos
+	local mods_tree = tree:add(tvbuf:range(pos), "activeMods")
+	mods_tree:add(pf.connection_accept_active_mods_size, tvbuf:range(pos, 1))
+	pos = pos + 1
+
+	for _=1, mods_size do
+		pos = dissect_mod_id(pos, tvbuf, pktinfo, mods_tree)
+	end
+	mods_tree.len = pos - mods_start_pos
+
+	-- TODO: startupModSettings
+
+	return pos
+end
 
 pf.heartbeat_flags = ProtoField.uint8("fgp.heartbeat.flags", "Flags", base.HEX, nil, 0)
 pf.has_heartbeat_requests      = ProtoField.bool("fgp.heartbeat.has_heartbeat_requests",      "HAS_HEARTBEAT_REQUESTS",      8, nil, 0x01)
@@ -602,6 +976,7 @@ input_actions[0x23] = {
 
 input_actions[0x24] = {
 	name = 'StopMovementInTheNextTick',
+	len = 1,
 }
 
 input_actions[0x25] = {
@@ -2124,6 +2499,7 @@ synchronizer_actions[0x0f] = {
 
 synchronizer_actions[0x10] = {
 	name = 'SkippedTickClosureConfirm',
+	len = 4,
 }
 
 synchronizer_actions[0x11] = {

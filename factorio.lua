@@ -221,10 +221,13 @@ function dissect_network_message(pos, tvbuf, pktinfo, tree)
 	local msg_type = fe.message_type()()
 	local msg_tree = tree:add(tvbuf:range(pos), NetworkMessageType[msg_type] or "Unknown")
 
-	-- Ping
-	-- PingReply
+	if msg_type == NetworkMessageTypeEnum.Ping then
+		pos = dissect_ping(pos, tvbuf, pktinfo, msg_tree)
 
-	if msg_type == NetworkMessageTypeEnum.ConnectionRequest then
+	elseif msg_type == NetworkMessageTypeEnum.PingReply then
+		pos = dissect_ping(pos, tvbuf, pktinfo, msg_tree)
+
+	elseif msg_type == NetworkMessageTypeEnum.ConnectionRequest then
 		pos = dissect_connection_request(pos, tvbuf, pktinfo, msg_tree)
 
 	elseif msg_type == NetworkMessageTypeEnum.ConnectionRequestReply then
@@ -242,10 +245,17 @@ function dissect_network_message(pos, tvbuf, pktinfo, tree)
 	elseif msg_type == NetworkMessageTypeEnum.ServerToClientHeartbeat then
 		pos = dissect_heartbeat(pos, tvbuf, pktinfo, msg_tree, true)
 
-	-- GetOwnAddress
-	-- GetOwnAddressReply
-	-- NatPunchRequest
-	-- NatPunch
+	elseif msg_type == NetworkMessageTypeEnum.GetOwnAddress then
+		pos = dissect_get_own_address(pos, tvbuf, pktinfo, msg_tree)
+
+	elseif msg_type == NetworkMessageTypeEnum.GetOwnAddressReply then
+		pos = dissect_get_own_address_reply(pos, tvbuf, pktinfo, msg_tree)
+
+	elseif msg_type == NetworkMessageTypeEnum.NatPunchRequest then
+		pos = dissect_nat_punch_request(pos, tvbuf, pktinfo, msg_tree)
+
+	elseif msg_type == NetworkMessageTypeEnum.NatPunch then
+		-- These look like they are always empty
 
 	elseif msg_type == NetworkMessageTypeEnum.TransferBlockRequest then
 		pos = dissect_transfer_block_request(pos, tvbuf, pktinfo, msg_tree)
@@ -270,6 +280,17 @@ function dissect_network_message(pos, tvbuf, pktinfo, tree)
 	end
 end
 
+
+pf.ping_number = ProtoField.uint16("fgp.ping.number", "number", base.DEC, nil, 0)
+
+function dissect_ping(pos, tvbuf, pktinfo, tree)
+	local number = tvbuf:range(pos, 2):le_uint()
+	tree:add_le(pf.ping_number, tvbuf:range(pos, 2))
+	pos = pos + 2
+
+	pktinfo.cols.info:append(" Nr=" .. number)
+	return pos
+end
 
 pf.connection_request_major_ver = ProtoField.uint8("fgp.connection_request.version.major", "major", base.DEC, nil, 0)
 pf.connection_request_minor_ver = ProtoField.uint8("fgp.connection_request.version.minor", "minor", base.DEC, nil, 0)
@@ -2599,6 +2620,67 @@ function dissect_synchronizer_action(pos, tvbuf, pktinfo, tree, is_server)
 end
 
 
+
+pf.get_addr_number = ProtoField.uint16("fgp.get_own_address.number", "number", base.DEC, nil, 0)
+
+function dissect_get_own_address(pos, tvbuf, pktinfo, tree)
+	local number = tvbuf:range(pos, 2):le_uint()
+	tree:add_le(pf.get_addr_number, tvbuf:range(pos, 2))
+	pos = pos + 2
+
+	pktinfo.cols.info:append(" Nr=" .. number)
+	return pos
+end
+
+pf.get_addr_reply_number = ProtoField.uint16("fgp.get_own_address_reply.number", "number", base.DEC, nil, 0)
+pf.get_addr_reply_addr_length = ProtoField.uint32("fgp.get_own_address_reply.reflexive_address.length", "length", base.DEC, nil, 0)
+pf.get_addr_reply_addr_data = ProtoField.string("fgp.get_own_address_reply.reflexive_address.data", "data", base.ASCII)
+
+function dissect_get_own_address_reply(pos, tvbuf, pktinfo, tree)
+	local number = tvbuf:range(pos, 2):le_uint()
+	tree:add_le(pf.get_addr_reply_number, tvbuf:range(pos, 2))
+	pos = pos + 2
+
+	pktinfo.cols.info:append(" Nr=" .. number)
+
+	local start_pos = pos
+	local length = tvbuf:range(pos, 4):le_uint()
+	local string_tree = tree:add(tvbuf:range(pos + 4 + length), "reflexiveAddress")
+	string_tree:add_le(pf.get_addr_reply_addr_length, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	local data = tvbuf:range(pos, length):string()
+	string_tree:append_text(": " .. data)
+	pktinfo.cols.info:append(" Addr=" .. data)
+
+	string_tree:add(pf.get_addr_reply_addr_data, tvbuf:range(pos, length))
+	pos = pos + length
+	string_tree.len = pos - start_pos
+
+	return pos
+end
+
+pf.punch_addr_length = ProtoField.uint32("fgp.nat_punch_request.addr.length", "length", base.DEC, nil, 0)
+pf.punch_addr_data = ProtoField.string("fgp.nat_punch_request.addr.data", "data", base.ASCII)
+
+
+function dissect_nat_punch_request(pos, tvbuf, pktinfo, tree)
+	local start_pos = pos
+	local length = tvbuf:range(pos, 4):le_uint()
+	local string_tree = tree:add(tvbuf:range(pos + 4 + length), "addr")
+	string_tree:add_le(pf.punch_addr_length, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	local data = tvbuf:range(pos, length):string()
+	string_tree:append_text(": " .. data)
+	pktinfo.cols.info:append(" Addr=" .. data)
+
+	string_tree:add(pf.punch_addr_data, tvbuf:range(pos, length))
+	pos = pos + length
+	string_tree.len = pos - start_pos
+
+	return pos
+end
 
 pf.block_number  = ProtoField.uint32("fgp.transfer_block.block_number", "blockNumber", base.DEC, nil, 0)
 pf.download_data = ProtoField.bytes("fgp.transfer_block.data", "data", base.NONE)

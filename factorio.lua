@@ -2742,7 +2742,7 @@ pf.unknown = ProtoField.bytes("fgp.unknown", "Undecoded Data", base.SPACE)
 pf.fragment  = ProtoField.framenum("fgp.fragment", "Fragment",base.NONE, frametype.NONE, 0, "Fragment")
 pf.fragments = ProtoField.bytes("fgp.fragments", "Fragments", base.SPACE, "Fragments")
 
-local fgp = Proto("fgp", "Factorio Game Protocol")
+local fgp = Proto("Factorio", "Factorio Game Protocol")
 fgp.fields = values(pf)
 
 for k, v in pairs(fe) do

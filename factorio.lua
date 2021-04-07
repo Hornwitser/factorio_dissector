@@ -1984,7 +1984,7 @@ function dissect_input_action(pos, tvbuf, pktinfo, tree)
 		else
 			pktinfo.cols.info:prepend("[Input #" .. input_type .. " len unknown] ")
 			input_tree:add_proto_expert_info(
-				ef.unknown, "Unknown length for " .. InputActionTypeEnum[input_type]
+				ef.unknown, "Unknown length for " .. InputActionType[input_type]
 			)
 			return pos, true
 

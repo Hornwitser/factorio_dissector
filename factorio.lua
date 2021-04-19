@@ -317,6 +317,8 @@ function dissect_connection_request(pos, tvbuf, pktinfo, tree)
 	ver_tree:add_le(pf.connection_request_build_ver, tvbuf:range(pos, 2))
 	pos = pos + 2
 
+	pktinfo.cols.info:append(" Ver=" .. version .. " CID=" .. tvbuf:range(pos, 4):le_uint())
+
 	tree:add_le(pf.connection_request_client_id, tvbuf:range(pos, 4))
 	pos = pos + 4
 	return pos
@@ -333,7 +335,7 @@ pf.connection_reply_server_id = ProtoField.uint32(
 	"fgp.connection_request_reply.connection_request_id_generated_on_server", "connectionRequestIDGeneratedOnServer", base.HEX, nil, 0
 )
 
-function dissect_connection_request_reply(pos, tvbuf, pktinf, tree)
+function dissect_connection_request_reply(pos, tvbuf, pktinfo, tree)
 	local version =
 		tvbuf:range(pos, 1):uint() .. "." ..
 		tvbuf:range(pos + 1, 1):uint() .. "." ..
@@ -349,6 +351,8 @@ function dissect_connection_request_reply(pos, tvbuf, pktinf, tree)
 	pos = pos + 1
 	ver_tree:add_le(pf.connection_reply_build_ver, tvbuf:range(pos, 2))
 	pos = pos + 2
+
+	pktinfo.cols.info:append(" Ver=" .. version .. " CID=" .. tvbuf:range(pos, 4):le_uint() .. " SID=" .. tvbuf:range(pos + 4, 4):le_uint())
 
 	tree:add_le(pf.connection_reply_client_id, tvbuf:range(pos, 4))
 	pos = pos + 4

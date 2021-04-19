@@ -822,347 +822,347 @@ end
 
 
 input_actions = {}
-input_actions[0x00] = {
+input_actions[0] = {
 	name = 'Nothing',
 }
 
-input_actions[0x01] = {
+input_actions[#input_actions+1] = {
 	name = 'StopWalking',
 	len = 1,
 }
 
-input_actions[0x02] = {
+input_actions[#input_actions+1] = {
 	name = 'BeginMining',
 	len = 1,
 }
 
-input_actions[0x03] = {
+input_actions[#input_actions+1] = {
 	name = 'StopMining',
 	len = 1,
 }
 
-input_actions[0x04] = {
+input_actions[#input_actions+1] = {
 	name = 'ToggleDriving',
 	len = 1,
 }
 
-input_actions[0x05] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenGui',
 	len = 1,
 }
 
-input_actions[0x06] = {
+input_actions[#input_actions+1] = {
 	name = 'CloseGui',
 	len = 1,
 }
 
-input_actions[0x07] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenCharacterGui',
 	len = 1,
 }
 
-input_actions[0x08] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenCurrentVehicleGui',
 	len = 1,
 }
 
-input_actions[0x09] = {
+input_actions[#input_actions+1] = {
 	name = 'ConnectRollingStock',
 	len = 1,
 }
 
-input_actions[0x0a] = {
+input_actions[#input_actions+1] = {
 	name = 'DisconnectRollingStock',
 	len = 1,
 }
 
-input_actions[0x0b] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectedEntityCleared',
 	len = 1,
 }
 
-input_actions[0x0c] = {
+input_actions[#input_actions+1] = {
 	name = 'ClearCursor',
 	len = 1,
 }
 
-input_actions[0x0d] = {
+input_actions[#input_actions+1] = {
 	name = 'ResetAssemblingMachine',
 	len = 1,
 }
 
-input_actions[0x0e] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenTechnologyGui',
 }
 
-input_actions[0x0f] = {
+input_actions[#input_actions+1] = {
 	name = 'LaunchRocket',
 	len = 1,
 }
 
-input_actions[0x10] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenProductionGui',
 	len = 1,
 }
 
-input_actions[0x11] = {
+input_actions[#input_actions+1] = {
 	name = 'StopRepair',
 	len = 1,
 }
 
-input_actions[0x12] = {
+input_actions[#input_actions+1] = {
 	name = 'CancelNewBlueprint',
 	len = 1,
 }
 
-input_actions[0x13] = {
+input_actions[#input_actions+1] = {
 	name = 'CloseBlueprintRecord',
 	len = 1,
 }
 
-input_actions[0x14] = {
+input_actions[#input_actions+1] = {
 	name = 'CopyEntitySettings',
 	len = 1,
 }
 
-input_actions[0x15] = {
+input_actions[#input_actions+1] = {
 	name = 'PasteEntitySettings',
 	len = 1,
 }
 
-input_actions[0x16] = {
+input_actions[#input_actions+1] = {
 	name = 'DestroyOpenedItem',
 	len = 1,
 }
 
-input_actions[0x17] = {
+input_actions[#input_actions+1] = {
 	name = 'CopyOpenedItem',
 	len = 1,
 }
 
-input_actions[0x18] = {
+input_actions[#input_actions+1] = {
 	name = 'ToggleShowEntityInfo',
 }
 
-input_actions[0x19] = {
+input_actions[#input_actions+1] = {
 	name = 'SingleplayerInit',
 	len = 1,
 }
 
-input_actions[0x1a] = {
+input_actions[#input_actions+1] = {
 	name = 'MultiplayerInit',
 }
 
-input_actions[0x1b] = {
+input_actions[#input_actions+1] = {
 	name = 'DisconnectAllPlayers',
 	len = 1,
 }
 
-input_actions[0x1c] = {
+input_actions[#input_actions+1] = {
 	name = 'SwitchToRenameStopGui',
 	len = 1,
 }
 
-input_actions[0x1d] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenBonusGui',
 	len = 1,
 }
 
-input_actions[0x1e] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenTrainsGui',
 	len = 1,
 }
 
-input_actions[0x1f] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenAchievementsGui',
 	len = 1,
 }
 
-input_actions[0x20] = {
+input_actions[#input_actions+1] = {
 	name = 'CycleBlueprintBookForwards',
 	len = 1,
 }
 
-input_actions[0x21] = {
+input_actions[#input_actions+1] = {
 	name = 'CycleBlueprintBookBackwards',
 }
 
-input_actions[0x22] = {
+input_actions[#input_actions+1] = {
 	name = 'CycleClipboardForwards',
 }
 
-input_actions[0x23] = {
+input_actions[#input_actions+1] = {
 	name = 'CycleClipboardBackwards',
 }
 
-input_actions[0x24] = {
+input_actions[#input_actions+1] = {
 	name = 'StopMovementInTheNextTick',
 	len = 1,
 }
 
-input_actions[0x25] = {
+input_actions[#input_actions+1] = {
 	name = 'ToggleEnableVehicleLogisticsWhileMoving',
 	len = 1,
 }
 
-input_actions[0x26] = {
+input_actions[#input_actions+1] = {
 	name = 'ToggleDeconstructionItemEntityFilterMode',
 }
 
-input_actions[0x27] = {
+input_actions[#input_actions+1] = {
 	name = 'ToggleDeconstructionItemTileFilterMode',
 }
 
-input_actions[0x28] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenLogisticGui',
 }
 
-input_actions[0x29] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectNextValidGun',
 	len = 1,
 }
 
-input_actions[0x2a] = {
+input_actions[#input_actions+1] = {
 	name = 'ToggleMapEditor',
 	len = 1,
 }
 
-input_actions[0x2b] = {
+input_actions[#input_actions+1] = {
 	name = 'DeleteBlueprintLibrary',
 	len = 1,
 }
 
-input_actions[0x2c] = {
+input_actions[#input_actions+1] = {
 	name = 'GameCreatedFromScenario',
 }
 
-input_actions[0x2d] = {
+input_actions[#input_actions+1] = {
 	name = 'ActivateCopy',
 }
 
-input_actions[0x2e] = {
+input_actions[#input_actions+1] = {
 	name = 'ActivateCut',
 }
 
-input_actions[0x2f] = {
+input_actions[#input_actions+1] = {
 	name = 'ActivatePaste',
 	len = 1,
 }
 
-input_actions[0x30] = {
+input_actions[#input_actions+1] = {
 	name = 'Undo',
 }
 
-input_actions[0x31] = {
+input_actions[#input_actions+1] = {
 	name = 'TogglePersonalRoboport',
 	len = 1,
 }
 
-input_actions[0x32] = {
+input_actions[#input_actions+1] = {
 	name = 'ToggleEquipmentMovementBonus',
 }
 
-input_actions[0x33] = {
+input_actions[#input_actions+1] = {
 	name = 'TogglePersonalLogisticRequests',
 }
 
-input_actions[0x34] = {
+input_actions[#input_actions+1] = {
 	name = 'ToggleEntityLogisticRequests',
 }
 
-input_actions[0x35] = {
+input_actions[#input_actions+1] = {
 	name = 'StopBuildingByMoving',
 	len = 1,
 }
 
-input_actions[0x36] = {
+input_actions[#input_actions+1] = {
 	name = 'FlushOpenedEntityFluid',
 	len = 9,
 }
 
-input_actions[0x37] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenTipsAndTricksGui',
 	len = 14,
 }
 
-input_actions[0x38] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenBlueprintLibraryGui',
 	len = 2,
 }
 
-input_actions[0x39] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeBlueprintLibraryTab',
 	len = 9,
 }
 
-input_actions[0x3a] = {
+input_actions[#input_actions+1] = {
 	name = 'DropItem',
 	len = 3,
 }
 
-input_actions[0x3b] = {
+input_actions[#input_actions+1] = {
 	name = 'Build',
 	len = 6
 }
 
-input_actions[0x3c] = {
+input_actions[#input_actions+1] = {
 	name = 'StartWalking',
 }
 
-input_actions[0x3d] = {
+input_actions[#input_actions+1] = {
 	name = 'BeginMiningTerrain',
 }
 
-input_actions[0x3e] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeRidingState',
 	len = 6
 }
 
-input_actions[0x3f] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenItem',
 	len = 6
 }
 
-input_actions[0x40] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenParentOfOpenedItem',
 	len = 6
 }
 
-input_actions[0x41] = {
+input_actions[#input_actions+1] = {
 	name = 'ResetItem',
 	len = 6
 }
 
-input_actions[0x42] = {
+input_actions[#input_actions+1] = {
 	name = 'DestroyItem',
 	len = 9
 }
 
-input_actions[0x43] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenModItem',
 	len = 7,
 }
 
-input_actions[0x44] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenEquipment',
 }
 
-input_actions[0x45] = {
+input_actions[#input_actions+1] = {
 	name = 'CursorTransfer',
 	len = 10,
 }
 
-input_actions[0x46] = {
+input_actions[#input_actions+1] = {
 	name = 'CursorSplit',
 	len = 3,
 }
 
-input_actions[0x47] = {
+input_actions[#input_actions+1] = {
 	name = 'StackTransfer',
 	len = 6,
 }
 
-input_actions[0x48] = {
+input_actions[#input_actions+1] = {
 	name = 'InventoryTransfer',
 	len = 5,
 }
@@ -1171,7 +1171,7 @@ input_actions[0x48] = {
 pf.crc_data_crc         = ProtoField.uint32("fgp.input_action.crc_data.crc", "crc", base.DEC, nil, 0)
 pf.crc_data_tick_of_crc = ProtoField.uint32("fgp.input_action.crc_data.tick_of_crc", "tickOfCrc",base.DEC, nil, 0)
 
-input_actions[0x49] = {
+input_actions[#input_actions+1] = {
 	name = 'CheckCRCHeuristic',
 	dissect = function(pos, tvbuf, pktinfo, tree)
 		pos, range, value = decode_uint16v(pos, tvbuf)
@@ -1186,740 +1186,740 @@ input_actions[0x49] = {
 	end
 }
 
-input_actions[0x4a] = {
+input_actions[#input_actions+1] = {
 	name = 'Craft',
 	len = 6,
 }
 
-input_actions[0x4b] = {
+input_actions[#input_actions+1] = {
 	name = 'WireDragging',
 	len = 5,
 }
 
-input_actions[0x4c] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeShootingState',
 	len = 8,
 }
 
-input_actions[0x4d] = {
+input_actions[#input_actions+1] = {
 	name = 'SetupAssemblingMachine',
 }
 
-input_actions[0x4e] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectedEntityChanged',
 }
 
-input_actions[0x4f] = {
+input_actions[#input_actions+1] = {
 	name = 'SmartPipette',
 }
 
-input_actions[0x50] = {
+input_actions[#input_actions+1] = {
 	name = 'StackSplit',
 	len = 3,
 }
 
-input_actions[0x51] = {
+input_actions[#input_actions+1] = {
 	name = 'InventorySplit',
 	len = 9
 }
 
-input_actions[0x52] = {
+input_actions[#input_actions+1] = {
 	name = 'CancelCraft',
 }
 
-input_actions[0x53] = {
+input_actions[#input_actions+1] = {
 	name = 'SetFilter',
 }
 
-input_actions[0x54] = {
+input_actions[#input_actions+1] = {
 	name = 'CheckCRC',
 	len = 10,
 }
 
-input_actions[0x55] = {
+input_actions[#input_actions+1] = {
 	name = 'SetCircuitCondition',
 }
 
-input_actions[0x56] = {
+input_actions[#input_actions+1] = {
 	name = 'SetSignal',
 }
 
-input_actions[0x57] = {
+input_actions[#input_actions+1] = {
 	name = 'StartResearch',
 }
 
-input_actions[0x58] = {
+input_actions[#input_actions+1] = {
 	name = 'SetLogisticFilterItem',
 }
 
-input_actions[0x59] = {
+input_actions[#input_actions+1] = {
 	name = 'SetLogisticFilterSignal',
 	len = 2,
 }
 
-input_actions[0x5a] = {
+input_actions[#input_actions+1] = {
 	name = 'SetCircuitModeOfOperation',
 	len = 13,
 }
 
-input_actions[0x5b] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiClick',
 }
 
-input_actions[0x5c] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiConfirmed',
 }
 
-input_actions[0x5d] = {
+input_actions[#input_actions+1] = {
 	name = 'WriteToConsole',
 	len = 18,
 }
 
-input_actions[0x5e] = {
+input_actions[#input_actions+1] = {
 	name = 'MarketOffer',
 	len = 10,
 }
 
-input_actions[0x5f] = {
+input_actions[#input_actions+1] = {
 	name = 'AddTrainStation',
 	len = 10,
 }
 
-input_actions[0x60] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeTrainStopStation',
 	len = 9,
 }
 
-input_actions[0x61] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeActiveItemGroupForCrafting',
 	len = 26,
 }
 
-input_actions[0x62] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeActiveItemGroupForFilters',
 	len = 6,
 }
 
-input_actions[0x63] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeActiveCharacterTab',
 	len = 2,
 }
 
-input_actions[0x64] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiTextChanged',
 }
 
-input_actions[0x65] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiCheckedStateChanged',
 	len = 9,
 }
 
-input_actions[0x66] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiSelectionStateChanged',
 }
 
-input_actions[0x67] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiSelectedTabChanged',
 }
 
-input_actions[0x68] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiValueChanged',
 	len = 24,
 }
 
-input_actions[0x69] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiSwitchStateChanged',
 }
 
-input_actions[0x6a] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiLocationChanged',
 	len = 24,
 }
 
-input_actions[0x6b] = {
+input_actions[#input_actions+1] = {
 	name = 'PlaceEquipment',
 }
 
-input_actions[0x6c] = {
+input_actions[#input_actions+1] = {
 	name = 'TakeEquipment',
 	len = 16, -- Variable length
 }
 
-input_actions[0x6d] = {
+input_actions[#input_actions+1] = {
 	name = 'UseItem',
 }
 
-input_actions[0x6e] = {
+input_actions[#input_actions+1] = {
 	name = 'SendSpidertron',
 }
 
-input_actions[0x6f] = {
+input_actions[#input_actions+1] = {
 	name = 'UseArtilleryRemote',
 	len = 7,
 }
 
-input_actions[0x70] = {
+input_actions[#input_actions+1] = {
 	name = 'SetInventoryBar',
 	len = 7,
 }
 
-input_actions[0x71] = {
+input_actions[#input_actions+1] = {
 	name = 'MoveOnZoom',
 }
 
-input_actions[0x72] = {
+input_actions[#input_actions+1] = {
 	name = 'StartRepair',
 	len = 7,
 }
 
-input_actions[0x73] = {
+input_actions[#input_actions+1] = {
 	name = 'Deconstruct',
 	len = 9,
 }
 
-input_actions[0x74] = {
+input_actions[#input_actions+1] = {
 	name = 'Upgrade',
 }
 
-input_actions[0x75] = {
+input_actions[#input_actions+1] = {
 	name = 'Copy',
 	len = 3,
 }
 
-input_actions[0x76] = {
+input_actions[#input_actions+1] = {
 	name = 'AlternativeCopy',
 }
 
-input_actions[0x77] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectBlueprintEntities',
 }
 
-input_actions[0x78] = {
+input_actions[#input_actions+1] = {
 	name = 'AltSelectBlueprintEntities',
 }
 
-input_actions[0x79] = {
+input_actions[#input_actions+1] = {
 	name = 'SetupBlueprint',
 }
 
-input_actions[0x7a] = {
+input_actions[#input_actions+1] = {
 	name = 'SetupSingleBlueprintRecord',
 }
 
-input_actions[0x7b] = {
+input_actions[#input_actions+1] = {
 	name = 'CopyOpenedBlueprint',
 }
 
-input_actions[0x7c] = {
+input_actions[#input_actions+1] = {
 	name = 'ReassignBlueprint',
 }
 
-input_actions[0x7d] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenBlueprintRecord',
 }
 
-input_actions[0x7e] = {
+input_actions[#input_actions+1] = {
 	name = 'GrabBlueprintRecord',
 	len = 8,
 }
 
-input_actions[0x7f] = {
+input_actions[#input_actions+1] = {
 	name = 'DropBlueprintRecord',
 }
 
-input_actions[0x80] = {
+input_actions[#input_actions+1] = {
 	name = 'DeleteBlueprintRecord',
 }
 
-input_actions[0x81] = {
+input_actions[#input_actions+1] = {
 	name = 'UpgradeOpenedBlueprintByRecord',
 }
 
-input_actions[0x82] = {
+input_actions[#input_actions+1] = {
 	name = 'UpgradeOpenedBlueprintByItem',
 }
 
-input_actions[0x83] = {
+input_actions[#input_actions+1] = {
 	name = 'SpawnItem',
 }
 
-input_actions[0x84] = {
+input_actions[#input_actions+1] = {
 	name = 'SpawnItemStackTransfer',
 }
 
-input_actions[0x85] = {
+input_actions[#input_actions+1] = {
 	name = 'UpdateBlueprintShelf',
 }
 
-input_actions[0x86] = {
+input_actions[#input_actions+1] = {
 	name = 'TransferBlueprint',
 	len = 14,
 }
 
-input_actions[0x87] = {
+input_actions[#input_actions+1] = {
 	name = 'TransferBlueprintImmediately',
 	len = 11,
 }
 
-input_actions[0x88] = {
+input_actions[#input_actions+1] = {
 	name = 'EditBlueprintToolPreview',
 }
 
-input_actions[0x89] = {
+input_actions[#input_actions+1] = {
 	name = 'RemoveCables',
 }
 
-input_actions[0x8a] = {
+input_actions[#input_actions+1] = {
 	name = 'ExportBlueprint',
 }
 
-input_actions[0x8b] = {
+input_actions[#input_actions+1] = {
 	name = 'ImportBlueprint',
 	len = 17,
 }
 
-input_actions[0x8c] = {
+input_actions[#input_actions+1] = {
 	name = 'ImportBlueprintsFiltered',
 	len = 7,
 }
 
-input_actions[0x8d] = {
+input_actions[#input_actions+1] = {
 	name = 'PlayerJoinGame',
 	len = 8, -- variable length
 }
 
-input_actions[0x8e] = {
+input_actions[#input_actions+1] = {
 	name = 'PlayerAdminChange',
 }
 
-input_actions[0x8f] = {
+input_actions[#input_actions+1] = {
 	name = 'CancelDeconstruct',
 	len = 2,
 }
 
-input_actions[0x90] = {
+input_actions[#input_actions+1] = {
 	name = 'CancelUpgrade',
 	len = 6,
 }
 
-input_actions[0x91] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeArithmeticCombinatorParameters',
 }
 
-input_actions[0x92] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeDeciderCombinatorParameters',
 }
 
-input_actions[0x93] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeProgrammableSpeakerParameters',
 }
 
-input_actions[0x94] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeProgrammableSpeakerAlertParameters',
 }
 
-input_actions[0x95] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeProgrammableSpeakerCircuitParameters',
 }
 
-input_actions[0x96] = {
+input_actions[#input_actions+1] = {
 	name = 'SetVehicleAutomaticTargetingParameters',
 }
 
-input_actions[0x97] = {
+input_actions[#input_actions+1] = {
 	name = 'BuildTerrain',
 }
 
-input_actions[0x98] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeTrainWaitCondition',
 	len = 17,
 }
 
-input_actions[0x99] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeTrainWaitConditionData',
 }
 
-input_actions[0x9a] = {
+input_actions[#input_actions+1] = {
 	name = 'CustomInput',
 }
 
-input_actions[0x9b] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeItemLabel',
 }
 
-input_actions[0x9c] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeItemDescription',
 }
 
-input_actions[0x9d] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeEntityLabel',
 }
 
-input_actions[0x9e] = {
+input_actions[#input_actions+1] = {
 	name = 'BuildRail',
 }
 
-input_actions[0x9f] = {
+input_actions[#input_actions+1] = {
 	name = 'CancelResearch',
 	len = 13,
 }
 
-input_actions[0xa0] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectArea',
 }
 
-input_actions[0xa1] = {
+input_actions[#input_actions+1] = {
 	name = 'AltSelectArea',
 }
 
-input_actions[0xa2] = {
+input_actions[#input_actions+1] = {
 	name = 'ServerCommand',
 	len = 5,
 }
 
-input_actions[0xa3] = {
+input_actions[#input_actions+1] = {
 	name = 'SetControllerLogisticTrashFilterItem',
 }
 
-input_actions[0xa4] = {
+input_actions[#input_actions+1] = {
 	name = 'SetEntityLogisticTrashFilterItem',
 }
 
-input_actions[0xa5] = {
+input_actions[#input_actions+1] = {
 	name = 'SetInfinityContainerFilterItem',
 }
 
-input_actions[0xa6] = {
+input_actions[#input_actions+1] = {
 	name = 'SetInfinityPipeFilter',
 	len = 9,
 }
 
-input_actions[0xa7] = {
+input_actions[#input_actions+1] = {
 	name = 'ModSettingsChanged',
 	len = 8,
 }
 
-input_actions[0xa8] = {
+input_actions[#input_actions+1] = {
 	name = 'SetEntityEnergyProperty',
 	len = 5,
 }
 
-input_actions[0xa9] = {
+input_actions[#input_actions+1] = {
 	name = 'EditCustomTag',
 	len = 3,
 }
 
-input_actions[0xaa] = {
+input_actions[#input_actions+1] = {
 	name = 'EditPermissionGroup',
 	len = 2,
 }
 
-input_actions[0xab] = {
+input_actions[#input_actions+1] = {
 	name = 'ImportBlueprintString',
 }
 
-input_actions[0xac] = {
+input_actions[#input_actions+1] = {
 	name = 'ImportPermissionsString',
 }
 
-input_actions[0xad] = {
+input_actions[#input_actions+1] = {
 	name = 'ReloadScript',
 }
 
-input_actions[0xae] = {
+input_actions[#input_actions+1] = {
 	name = 'ReloadScriptDataTooLarge',
 }
 
-input_actions[0xaf] = {
+input_actions[#input_actions+1] = {
 	name = 'GuiElemChanged',
 }
 
-input_actions[0xb0] = {
+input_actions[#input_actions+1] = {
 	name = 'BlueprintTransferQueueUpdate',
 	len = 2,
 }
 
-input_actions[0xb1] = {
+input_actions[#input_actions+1] = {
 	name = 'DragTrainSchedule',
 	len = 2,
 }
 
-input_actions[0xb2] = {
+input_actions[#input_actions+1] = {
 	name = 'DragTrainWaitCondition',
 	len = 3,
 }
 
-input_actions[0xb3] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectItem',
 	len = 5,
 }
 
-input_actions[0xb4] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectEntitySlot',
 	len = 5,
 }
 
-input_actions[0xb5] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectTileSlot',
 }
 
-input_actions[0xb6] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectMapperSlot',
 }
 
-input_actions[0xb7] = {
+input_actions[#input_actions+1] = {
 	name = 'DisplayResolutionChanged',
 }
 
-input_actions[0xb8] = {
+input_actions[#input_actions+1] = {
 	name = 'QuickBarSetSlot',
 }
 
-input_actions[0xb9] = {
+input_actions[#input_actions+1] = {
 	name = 'QuickBarPickSlot',
 }
 
-input_actions[0xba] = {
+input_actions[#input_actions+1] = {
 	name = 'QuickBarSetSelectedPage',
 }
 
-input_actions[0xbb] = {
+input_actions[#input_actions+1] = {
 	name = 'PlayerLeaveGame',
 	len = 2,
 }
 
-input_actions[0xbc] = {
+input_actions[#input_actions+1] = {
 	name = 'MapEditorAction',
 	len = 2,
 }
 
-input_actions[0xbd] = {
+input_actions[#input_actions+1] = {
 	name = 'PutSpecialItemInMap',
 	len = 2,
 }
 
-input_actions[0xbe] = {
+input_actions[#input_actions+1] = {
 	name = 'PutSpecialRecordInMap',
 	len = 2,
 }
 
-input_actions[0xbf] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeMultiplayerConfig',
 	len = 2,
 }
 
-input_actions[0xc0] = {
+input_actions[#input_actions+1] = {
 	name = 'AdminAction',
 }
 
-input_actions[0xc1] = {
+input_actions[#input_actions+1] = {
 	name = 'LuaShortcut',
 }
 
-input_actions[0xc2] = {
+input_actions[#input_actions+1] = {
 	name = 'TranslateString',
 }
 
-input_actions[0xc3] = {
+input_actions[#input_actions+1] = {
 	name = 'FlushOpenedEntitySpecificFluid',
 }
 
-input_actions[0xc4] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangePickingState',
 }
 
-input_actions[0xc5] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectedEntityChangedVeryClose',
 	len = 2,
 }
 
-input_actions[0xc6] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectedEntityChangedVeryClosePrecise',
 }
 
-input_actions[0xc7] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectedEntityChangedRelative',
 	len = 5,
 }
 
-input_actions[0xc8] = {
+input_actions[#input_actions+1] = {
 	name = 'SelectedEntityChangedBasedOnUnitNumber',
 }
 
-input_actions[0xc9] = {
+input_actions[#input_actions+1] = {
 	name = 'SetAutosortInventory',
 }
 
-input_actions[0xca] = {
+input_actions[#input_actions+1] = {
 	name = 'SetFlatControllerGui',
 }
 
-input_actions[0xcb] = {
+input_actions[#input_actions+1] = {
 	name = 'SetRecipeNotifications',
 }
 
-input_actions[0xcc] = {
+input_actions[#input_actions+1] = {
 	name = 'SetAutoLaunchRocket',
 }
 
-input_actions[0xcd] = {
+input_actions[#input_actions+1] = {
 	name = 'SwitchConstantCombinatorState',
 }
 
-input_actions[0xce] = {
+input_actions[#input_actions+1] = {
 	name = 'SwitchPowerSwitchState',
 	len = 9,
 }
 
-input_actions[0xcf] = {
+input_actions[#input_actions+1] = {
 	name = 'SwitchInserterFilterModeState',
 	len = 2,
 }
 
-input_actions[0xd0] = {
+input_actions[#input_actions+1] = {
 	name = 'SwitchConnectToLogisticNetwork',
 }
 
-input_actions[0xd1] = {
+input_actions[#input_actions+1] = {
 	name = 'SetBehaviorMode',
 	len = 9,
 }
 
-input_actions[0xd2] = {
+input_actions[#input_actions+1] = {
 	name = 'FastEntityTransfer',
 	len = 2,
 }
 
-input_actions[0xd3] = {
+input_actions[#input_actions+1] = {
 	name = 'RotateEntity',
 }
 
-input_actions[0xd4] = {
+input_actions[#input_actions+1] = {
 	name = 'FastEntitySplit',
 }
 
-input_actions[0xd5] = {
+input_actions[#input_actions+1] = {
 	name = 'SetTrainStopped',
 }
 
-input_actions[0xd6] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeControllerSpeed',
 }
 
-input_actions[0xd7] = {
+input_actions[#input_actions+1] = {
 	name = 'SetAllowCommands',
 }
 
-input_actions[0xd8] = {
+input_actions[#input_actions+1] = {
 	name = 'SetResearchFinishedStopsGame',
 }
 
-input_actions[0xd9] = {
+input_actions[#input_actions+1] = {
 	name = 'SetInserterMaxStackSize',
 	len = 2,
 }
 
-input_actions[0xda] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenTrainGui',
 }
 
-input_actions[0xdb] = {
+input_actions[#input_actions+1] = {
 	name = 'SetEntityColor',
 }
 
-input_actions[0xdc] = {
+input_actions[#input_actions+1] = {
 	name = 'SetDeconstructionItemTreesAndRocksOnly',
 }
 
-input_actions[0xdd] = {
+input_actions[#input_actions+1] = {
 	name = 'SetDeconstructionItemTileSelectionMode',
 }
 
-input_actions[0xde] = {
+input_actions[#input_actions+1] = {
 	name = 'DeleteCustomTag',
 }
 
-input_actions[0xdf] = {
+input_actions[#input_actions+1] = {
 	name = 'DeletePermissionGroup',
 }
 
-input_actions[0xe0] = {
+input_actions[#input_actions+1] = {
 	name = 'AddPermissionGroup',
 }
 
-input_actions[0xe1] = {
+input_actions[#input_actions+1] = {
 	name = 'SetInfinityContainerRemoveUnfilteredItems',
 }
 
-input_actions[0xe2] = {
+input_actions[#input_actions+1] = {
 	name = 'SetCarWeaponsControl',
 }
 
-input_actions[0xe3] = {
+input_actions[#input_actions+1] = {
 	name = 'SetRequestFromBuffers',
 }
 
-input_actions[0xe4] = {
+input_actions[#input_actions+1] = {
 	name = 'ChangeActiveQuickBar',
 }
 
-input_actions[0xe5] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenPermissionsGui',
 }
 
-input_actions[0xe6] = {
+input_actions[#input_actions+1] = {
 	name = 'DisplayScaleChanged',
 }
 
-input_actions[0xe7] = {
+input_actions[#input_actions+1] = {
 	name = 'SetSplitterPriority',
 }
 
-input_actions[0xe8] = {
+input_actions[#input_actions+1] = {
 	name = 'GrabInternalBlueprintFromText',
 }
 
-input_actions[0xe9] = {
+input_actions[#input_actions+1] = {
 	name = 'SetHeatInterfaceTemperature',
 }
 
-input_actions[0xea] = {
+input_actions[#input_actions+1] = {
 	name = 'SetHeatInterfaceMode',
 }
 
-input_actions[0xeb] = {
+input_actions[#input_actions+1] = {
 	name = 'OpenTrainStationGui',
 }
 
-input_actions[0xec] = {
+input_actions[#input_actions+1] = {
 	name = 'RemoveTrainStation',
 }
 
-input_actions[0xed] = {
+input_actions[#input_actions+1] = {
 	name = 'GoToTrainStation',
 }
 
-input_actions[0xee] = {
+input_actions[#input_actions+1] = {
 	name = 'RenderModeChanged',
 }
 
-input_actions[0xef] = {
+input_actions[#input_actions+1] = {
 	name = 'SetPlayerColor',
 }
 
-input_actions[0xf0] = {
+input_actions[#input_actions+1] = {
 	name = 'PlayerClickedGpsTag',
 }
 
-input_actions[0xf1] = {
+input_actions[#input_actions+1] = {
 	name = 'SetTrainsLimit',
 }
 
-input_actions[0xf2] = {
+input_actions[#input_actions+1] = {
 	name = 'ClearRecipeNotification',
 }
 
-input_actions[0xf3] = {
+input_actions[#input_actions+1] = {
 	name = 'SetLinkedContainerLinkID',
 }
 

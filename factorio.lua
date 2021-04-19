@@ -1081,6 +1081,10 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'ForceFullCRC',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'OpenTipsAndTricksGui',
 	len = 14,
 }

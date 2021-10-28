@@ -263,7 +263,8 @@ function dissect_network_message(pos, tvbuf, pktinfo, tree)
 	elseif msg_type == NetworkMessageTypeEnum.TransferBlock then
 		pos = dissect_transfer_block(pos, tvbuf, pktinfo, msg_tree)
 
-	-- RequestForHeartbeatWhenDisconnecting
+	elseif msg_type == NetworkMessageTypeEnum.RequestForHeartbeatWhenDisconnecting then
+		pos = dissect_heartbeat_request(pos, tvbuf, pktinfo, msg_tree)
 
 	elseif msg_type == NetworkMessageTypeEnum.LANBroadcast then
 		pos = dissect_lan_broadcast(pos, tvbuf, pktinfo, msg_tree)
@@ -760,7 +761,7 @@ function dissect_heartbeat(pos, tvbuf, pktinfo, tree, is_server)
 
 	if not hit_unknown and fe.has_heartbeat_requests()() then
 		local req_count = tvbuf:range(pos, 1):uint()
-		req_tree = tree:add(tvbuf:range(pos, 1 + req_count * 4), "requestsForHeartbeat: " .. req_count)
+		local req_tree = tree:add(tvbuf:range(pos, 1 + req_count * 4), "requestsForHeartbeat: " .. req_count)
 		req_tree:add(pf.strange_size, tvbuf:range(pos, 1))
 		pos = pos + 1
 		for _=1, req_count do
@@ -2687,6 +2688,7 @@ synchronizer_actions[0x12] = {
 
 synchronizer_actions[0x13] = {
 	name = 'SavingCountDown',
+	len = 8,
 }
 
 synchronizer_actions[0x14] = {
@@ -2869,6 +2871,34 @@ function dissect_transfer_block(pos, tvbuf, pktinfo, tree)
 	return tvbuf:len()
 end
 
+
+pf.heartbeat_request_next_sequence_id = ProtoField.uint32("fgp.request_for_heartbeat_when_disconnecting.next_sequenc_id", "nextSequenceID", base.DEC, nil, 0)
+pf.heartbeat_request_size = ProtoField.uint8("fgp.request_for_heartbeat_when_disconnecting.requests.size", "size", base.DEC, nil, 0)
+pf.heartbeat_request_item = ProtoField.uint32("fgp.request_for_heartbeat_when_disconnecting.requests.item", "item", base.DEC, nil, 0)
+
+function dissect_heartbeat_request(pos, tvbuf, pktinfo, tree)
+	if tvbuf:len() - pos < 5 then
+		tree:add_proto_expert_info(ef.too_short)
+		return
+	end
+
+	tree:add_le(pf.heartbeat_request_next_sequence_id, tvbuf:range(pos, 4))
+	pos = pos + 4
+
+	local req_tree_start_pos = pos;
+	local req_tree = tree:add(tvbuf:range(pos), "requests")
+	local req_size_range, req_size
+	pos, req_size_range, req_size = decode_uint32v(pos, tvbuf)
+	req_tree:add(pf.heartbeat_request_size, req_size_range, req_size)
+
+	for _=1, req_size do
+		req_tree:add_le(pf.heartbeat_request_item, tvbuf:range(pos, 4))
+		pos = pos + 4
+	end
+	req_tree.len = pos - req_tree_start_pos
+
+	return tvbuf:len()
+end
 
 
 pf.game_port = ProtoField.uint16("fgp.lan_broadcast.game_port", "gamePort", base.DEC, nil, 0)

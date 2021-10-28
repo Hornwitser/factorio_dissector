@@ -593,6 +593,7 @@ pf.connection_accept_server_hash_data = ProtoField.string("fgp.connection_accept
 pf.connection_accept_description_length = ProtoField.uint32("fgp.connection_accept_or_deny.description.length", "length", base.DEC, nil, 0)
 pf.connection_accept_description_data = ProtoField.string("fgp.connection_accept_or_deny.description.data", "data", base.ASCII)
 pf.connection_accept_latency = ProtoField.uint8("fpg.connection_accept_or_deny.latency", "latency", base.DEC, nil, 0)
+pf.connection_accept_max_updates = ProtoField.uint32("fgp.connection_accept_or_deny.max_updates_per_second", "maxUpdatesPerSecond", base.DEC, nil, 0)
 pf.connection_accept_game_id = ProtoField.uint32("fpg.connection_accept_or_deny.game_id", "gameID", base.DEC, nil, 0)
 pf.connection_accept_steam_id = ProtoField.uint64("fpg.connection_accept_or_deny.steam_id", "steamID", base.DEC, nil, 0)
 pf.connection_accept_expect_seq = ProtoField.uint32("fgp.connection_accept_or_deny.first_sequence_number_to_expect", "firstSequenceNumberToExpect", base.DEC, nil, 0)
@@ -613,6 +614,10 @@ function dissect_connection_accept_or_deny(pos, tvbuf, pktinf, tree)
 
 	tree:add(pf.connection_accept_latency, tvbuf:range(pos, 1))
 	pos = pos + 1
+
+	local max_updates_range, max_updates
+	pos, max_updates_range, max_updates = decode_uint32v(pos, tvbuf)
+	tree:add(pf.connection_accept_max_updates, max_updates_range, max_updates)
 
 	tree:add_le(pf.connection_accept_game_id, tvbuf:range(pos, 4))
 	pos = pos + 4

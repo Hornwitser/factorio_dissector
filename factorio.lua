@@ -85,6 +85,40 @@ function decode_string(pos, tvbuf, tree, name, pf_name, show_value)
 	return pos, data
 end
 
+pf.localized_string_key_length = ProtoField.uint32("fgp.localized_string.key.length", "length", base.DEC, nil, 0)
+pf.localized_string_key_data = ProtoField.string("fgp.localized_string.key.data", "data", base.ASCII)
+local LocalizedStringMode = {
+	[0] = 'Empty',
+	[1] = 'Translation',
+	[2] = 'Literal',
+	[3] = 'LiteralTranslation',
+}
+pf.localized_string_mode = ProtoField.uint8("fpg.localized_string.mode", "mode", base.DEC, LocalizedStringMode, 0)
+pf.localized_string_parameters_size = ProtoField.uint8("fgp.localized_string.parameters.size", "size", base.DEC, nil, 0)
+
+function decode_localized_string(pos, tvbuf, tree, name)
+    local start_pos = pos
+    local string_tree = tree:add(tvbuf:range(pos), name)
+
+    pos = decode_string(pos, tvbuf, string_tree, "key", "localized_string_key")
+
+	string_tree:add(pf.localized_string_mode, tvbuf:range(pos, 1))
+	pos = pos + 1
+
+	local parameters_size = tvbuf:range(pos, 1):uint()
+	local parameters_start_pos = pos
+	local parameters_tree = string_tree:add(tvbuf:range(pos), "parameters")
+	parameters_tree:add(pf.localized_string_parameters_size, tvbuf:range(pos, 1))
+	pos = pos + 1
+
+	for _=1, parameters_size do
+		pos = decode_localized_string(pos, tvbuf, parameters_tree, tostring(_ - 1))
+	end
+	parameters_tree.len = pos - parameters_start_pos
+    string_tree.len = pos - start_pos
+    return pos
+end
+
 
 local NetworkMessageType = {
 	[0] = 'Ping',
@@ -1855,8 +1889,19 @@ input_actions[#input_actions+1] = {
 	name = 'LuaShortcut',
 }
 
+pf.translation_result_data_result_length = ProtoField.uint32("fgp.input_action.translation_result_data.result.length", "length", base.DEC, nil, 0)
+pf.translation_result_data_result_data = ProtoField.string("fgp.input_action.translation_result_data.result.data", "data", base.ASCII)
+pf.translation_result_data_translated = ProtoField.bool("fgp.input_action.translation_result_data.translated", "translated", 0, nil, 0)
 input_actions[#input_actions+1] = {
 	name = 'TranslateString',
+	dissect = function(pos, tvbuf, pktinfo, tree)
+        pos = decode_localized_string(pos, tvbuf, tree, "localized_string")
+		pos = decode_string(pos, tvbuf, tree, "result", "translation_result_data_result")
+
+        tree:add(pf.translation_result_data_translated, tvbuf:range(pos, 1))
+        pos = pos + 1
+		return pos
+	end,
 }
 
 input_actions[#input_actions+1] = {

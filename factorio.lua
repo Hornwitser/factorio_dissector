@@ -1738,6 +1738,10 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'ReverseSelectArea',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'ServerCommand',
 	len = 4,
 }

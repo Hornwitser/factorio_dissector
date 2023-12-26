@@ -345,9 +345,9 @@ function dissect_connection_request(pos, tvbuf, pktinfo, tree)
 	local ver_tree = tree:add(tvbuf:range(pos, 5), "clientApplicationVersion: " .. version)
 	ver_tree:add(pf.connection_request_major_ver, tvbuf:range(pos, 1))
 	pos = pos + 1
-	ver_tree:add(pf.connection_request_major_ver, tvbuf:range(pos, 1))
+	ver_tree:add(pf.connection_request_minor_ver, tvbuf:range(pos, 1))
 	pos = pos + 1
-	ver_tree:add(pf.connection_request_major_ver, tvbuf:range(pos, 1))
+	ver_tree:add(pf.connection_request_patch_ver, tvbuf:range(pos, 1))
 	pos = pos + 1
 	ver_tree:add_le(pf.connection_request_build_ver, tvbuf:range(pos, 2))
 	pos = pos + 2
@@ -380,9 +380,9 @@ function dissect_connection_request_reply(pos, tvbuf, pktinfo, tree)
 	local ver_tree = tree:add(tvbuf:range(pos, 5), "serverApplicationVersion: " .. version)
 	ver_tree:add(pf.connection_reply_major_ver, tvbuf:range(pos, 1))
 	pos = pos + 1
-	ver_tree:add(pf.connection_reply_major_ver, tvbuf:range(pos, 1))
+	ver_tree:add(pf.connection_reply_minor_ver, tvbuf:range(pos, 1))
 	pos = pos + 1
-	ver_tree:add(pf.connection_reply_major_ver, tvbuf:range(pos, 1))
+	ver_tree:add(pf.connection_reply_patch_ver, tvbuf:range(pos, 1))
 	pos = pos + 1
 	ver_tree:add_le(pf.connection_reply_build_ver, tvbuf:range(pos, 2))
 	pos = pos + 2

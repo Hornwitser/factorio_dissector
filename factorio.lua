@@ -35,7 +35,7 @@ local ef = {}
 ef.too_short   = ProtoExpert.new("fgp.too_short.expert", "Factorio Game Protocol packet too short", expert.group.MALFORMED, expert.severity.ERROR)
 ef.unknown     = ProtoExpert.new("fgp.unknown.expert", "Factorio Game Protocol unknown packet data", expert.group.UNDECODED, expert.severity.WARN)
 ef.malformed   = ProtoExpert.new("fgp.malformed.expert", "Factorio Game Protocol malformed data", expert.group.MALFORMED, expert.severity.ERROR)
-ef.unnecessary = ProtoExpert.new("fgp.unnecessary.expert", "Factorio Game PRotocol unnecessary encoding", expert.group.PROTOCOL, expert.severity.NOTE)
+ef.unnecessary = ProtoExpert.new("fgp.unnecessary.expert", "Factorio Game Protocol unnecessary encoding", expert.group.PROTOCOL, expert.severity.NOTE)
 
 
 function decode_uint32v(pos, tvbuf)

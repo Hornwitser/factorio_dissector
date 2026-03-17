@@ -7,7 +7,8 @@ Plugin that dissects packets from Factorio in Wireshark.
 To install this plugin copy factorio.lua to Wireshark's plugin directory.
 (on windows this directory is in %APPDATA%\\Wireshark\\plugins, you may have to create it.)
 
-Only the latest version of Factorio is supported, most parts of the protocol is not dissected and many parts miss decoding or is decoded incorrectly.
+Only the latest version of Factorio is supported, for earlier versions see the tags in the git repository.
+Most parts of the protocol is not dissected and many parts miss decoding or is decoded incorrectly.
 Contributions adding decoding of more fields is welcome, but please do try to follow the code style of the dissector.
 
 

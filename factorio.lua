@@ -2720,14 +2720,24 @@ synchronizer_actions[0x0e] = {
 	clen = 0,
 }
 
+pf.skipped_tick = ProtoField.uint32("fgp.skipped_tick", "tick", base.DEC, nil, 0)
+
 synchronizer_actions[0x0f] = {
 	name = 'SkippedTickClosure',
-	len = 4,
+	dissect = function(pos, tvbuf, pktinfo, tree, is_server)
+		tree:add_le(pf.skipped_tick, tvbuf:range(pos, 4))
+		pos = pos + 4
+		return pos, false
+	end,
 }
 
 synchronizer_actions[0x10] = {
 	name = 'SkippedTickClosureConfirm',
-	len = 4,
+	dissect = function(pos, tvbuf, pktinfo, tree, is_server)
+		tree:add_le(pf.skipped_tick, tvbuf:range(pos, 4))
+		pos = pos + 4
+		return pos, false
+	end,
 }
 
 synchronizer_actions[0x11] = {

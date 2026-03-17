@@ -4,6 +4,7 @@
 -- Reverse engineered from packet captures and factorio.pdb
 -- by Hornwitser
 
+bit32 = bit
 
 -- Converts a table of key, value pairs into an array of values
 function values(iterable)

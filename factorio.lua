@@ -98,10 +98,10 @@ pf.localized_string_mode = ProtoField.uint8("fpg.localized_string.mode", "mode",
 pf.localized_string_parameters_size = ProtoField.uint8("fgp.localized_string.parameters.size", "size", base.DEC, nil, 0)
 
 function decode_localized_string(pos, tvbuf, tree, name)
-    local start_pos = pos
-    local string_tree = tree:add(tvbuf:range(pos), name)
+	local start_pos = pos
+	local string_tree = tree:add(tvbuf:range(pos), name)
 
-    pos = decode_string(pos, tvbuf, string_tree, "key", "localized_string_key")
+	pos = decode_string(pos, tvbuf, string_tree, "key", "localized_string_key")
 
 	string_tree:add(pf.localized_string_mode, tvbuf:range(pos, 1))
 	pos = pos + 1
@@ -116,8 +116,8 @@ function decode_localized_string(pos, tvbuf, tree, name)
 		pos = decode_localized_string(pos, tvbuf, parameters_tree, tostring(_ - 1))
 	end
 	parameters_tree.len = pos - parameters_start_pos
-    string_tree.len = pos - start_pos
-    return pos
+	string_tree.len = pos - start_pos
+	return pos
 end
 
 
@@ -331,7 +331,7 @@ end
 pf.connection_request_major_ver = ProtoField.uint8("fgp.connection_request.version.major", "major", base.DEC, nil, 0)
 pf.connection_request_minor_ver = ProtoField.uint8("fgp.connection_request.version.minor", "minor", base.DEC, nil, 0)
 pf.connection_request_patch_ver = ProtoField.uint8("fgp.connection_request.version.patch", "patch", base.DEC, nil, 0)
-pf.connection_request_build_ver = ProtoField.uint16("fgp.connection_request.version.build", "build", base.DEC, nil, 0)
+pf.connection_request_build_ver = ProtoField.uint32("fgp.connection_request.version.build", "build", base.DEC, nil, 0)
 pf.connection_request_client_id = ProtoField.uint32(
 	"fgp.connection_request.connection_request_id_generated_on_client", "connectionRequestIDGeneratedOnClient", base.HEX, nil, 0
 )
@@ -350,8 +350,8 @@ function dissect_connection_request(pos, tvbuf, pktinfo, tree)
 	pos = pos + 1
 	ver_tree:add(pf.connection_request_patch_ver, tvbuf:range(pos, 1))
 	pos = pos + 1
-	ver_tree:add_le(pf.connection_request_build_ver, tvbuf:range(pos, 2))
-	pos = pos + 2
+	ver_tree:add_le(pf.connection_request_build_ver, tvbuf:range(pos, 4))
+	pos = pos + 4
 
 	pktinfo.cols.info:append(" Ver=" .. version .. " CID=" .. tvbuf:range(pos, 4):le_uint())
 
@@ -363,13 +363,14 @@ end
 pf.connection_reply_major_ver = ProtoField.uint8("fgp.connection_request_reply.version.major", "major", base.DEC, nil, 0)
 pf.connection_reply_minor_ver = ProtoField.uint8("fgp.connection_request_reply.version.minor", "minor", base.DEC, nil, 0)
 pf.connection_reply_patch_ver = ProtoField.uint8("fgp.connection_request_reply.version.patch", "patch", base.DEC, nil, 0)
-pf.connection_reply_build_ver = ProtoField.uint16("fgp.connection_request_reply.version.build", "build", base.DEC, nil, 0)
+pf.connection_reply_build_ver = ProtoField.uint32("fgp.connection_request_reply.version.build", "build", base.DEC, nil, 0)
 pf.connection_reply_client_id = ProtoField.uint32(
 	"fgp.connection_request_reply.connection_request_id_generated_on_client", "connectionRequestIDGeneratedOnClient", base.HEX, nil, 0
 )
 pf.connection_reply_server_id = ProtoField.uint32(
 	"fgp.connection_request_reply.connection_request_id_generated_on_server", "connectionRequestIDGeneratedOnServer", base.HEX, nil, 0
 )
+pf.connection_reply_max_pkg_s = ProtoField.uint16("fgb.connection_request_reply.max_packet_size", "maxPacketSize", base.DEC, nil, 0)
 
 function dissect_connection_request_reply(pos, tvbuf, pktinfo, tree)
 	local version =
@@ -385,8 +386,8 @@ function dissect_connection_request_reply(pos, tvbuf, pktinfo, tree)
 	pos = pos + 1
 	ver_tree:add(pf.connection_reply_patch_ver, tvbuf:range(pos, 1))
 	pos = pos + 1
-	ver_tree:add_le(pf.connection_reply_build_ver, tvbuf:range(pos, 2))
-	pos = pos + 2
+	ver_tree:add_le(pf.connection_reply_build_ver, tvbuf:range(pos, 4))
+	pos = pos + 4
 
 	pktinfo.cols.info:append(" Ver=" .. version .. " CID=" .. tvbuf:range(pos, 4):le_uint() .. " SID=" .. tvbuf:range(pos + 4, 4):le_uint())
 
@@ -395,6 +396,9 @@ function dissect_connection_request_reply(pos, tvbuf, pktinfo, tree)
 
 	tree:add_le(pf.connection_reply_server_id, tvbuf:range(pos, 4))
 	pos = pos + 4
+
+	tree:add_le(pf.connection_reply_max_pkg_s, tvbuf:range(pos, 2))
+	pos = pos + 2
 	return pos
 end
 
@@ -711,7 +715,7 @@ pf.heartbeat_tick_closures_count = ProtoField.uint8("fgp.heartbeat.tick_closures
 
 fe.heartbeat_sequence_number = "fgp.heartbeat.sequence_number"
 
-pf.client_gametick_timeshift = ProtoField.uint32("fgp.client_gametick.timeshift", "nextToReceiveServerTickClosure",   base.DEC, nil, 0)
+pf.client_gametick_timeshift = ProtoField.uint64("fgp.client_gametick.timeshift", "nextToReceiveServerTickClosure",   base.DEC, nil, 0)
 pf.heartbeat_synchronizer_actions_count = ProtoField.uint8("fgp.heartbeat.synchronizer_actions.size", "size", base.DEC, nil, 0)
 
 pf.strange_size = ProtoField.uint8("fgp.heartbeat.request_for_heartbeat.size", "size", base.DEC, nil, 0)
@@ -777,8 +781,8 @@ function dissect_heartbeat(pos, tvbuf, pktinfo, tree, is_server)
 	end
 
 	if not hit_unknown and not is_server then
-		tree:add_le(pf.client_gametick_timeshift, tvbuf:range(pos, 4))
-		pos = pos + 4
+		tree:add_le(pf.client_gametick_timeshift, tvbuf:range(pos, 8))
+		pos = pos + 8
 	end
 
 	if not hit_unknown and fe.has_synchronizer_action()() then
@@ -815,7 +819,7 @@ end
 
 
 
-pf.tick_closure_update_tick   = ProtoField.uint32("fgp.tick_closure.update_tick",  "updateTick",   base.DEC, nil, 0)
+pf.tick_closure_update_tick   = ProtoField.uint64("fgp.tick_closure.update_tick",  "updateTick",   base.DEC, nil, 0)
 pf.tick_closure_segments_size = ProtoField.uint8("fgp.tick_closure.input_action_segments.size", "size", base.DEC, nil, 0)
 
 -- class TickClosure
@@ -823,8 +827,8 @@ function dissect_tick_closure(pos, tvbuf, pktinfo, tree, is_empty)
 	local tick_tree = tree:add(tvbuf:range(pos), "TickClosure")
 	local start_pos = pos
 
-	tick_tree:add_le(pf.tick_closure_update_tick, tvbuf:range(pos, 4))
-	pos = pos + 4
+	tick_tree:add_le(pf.tick_closure_update_tick, tvbuf:range(pos, 8))
+	pos = pos + 8
 
 	local hit_unknown = false
 	if not is_empty then
@@ -871,6 +875,9 @@ pf.input_action_string_length = ProtoField.uint32("fgp.input_action.string.lengt
 pf.input_action_string_data = ProtoField.string("fgp.input_action.string.length", "data", base.ASCII)
 
 input_actions = {}
+
+-- Input actions with no data
+
 input_actions[0] = {
 	name = 'Nothing',
 	len = 0,
@@ -898,11 +905,6 @@ input_actions[#input_actions+1] = {
 
 input_actions[#input_actions+1] = {
 	name = 'OpenGui',
-	len = 0,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'CloseGui',
 	len = 0,
 }
 
@@ -938,16 +940,6 @@ input_actions[#input_actions+1] = {
 
 input_actions[#input_actions+1] = {
 	name = 'ResetAssemblingMachine',
-	len = 0,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'OpenTechnologyGui',
-	len = 0,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'LaunchRocket',
 	len = 0,
 }
 
@@ -992,6 +984,11 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'CopyLargeOpenedItem',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
 	name = 'ToggleShowEntityInfo',
 	len = 0,
 }
@@ -1012,17 +1009,7 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'SwitchToRenameStopGui',
-	len = 0,
-}
-
-input_actions[#input_actions+1] = {
 	name = 'OpenBonusGui',
-	len = 0,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'OpenTrainsGui',
 	len = 0,
 }
 
@@ -1038,6 +1025,16 @@ input_actions[#input_actions+1] = {
 
 input_actions[#input_actions+1] = {
 	name = 'CycleBlueprintBookBackwards',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'CycleQualityUp',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'CycleQualityDown',
 	len = 0,
 }
 
@@ -1072,11 +1069,6 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'OpenLogisticGui',
-	len = 0,
-}
-
-input_actions[#input_actions+1] = {
 	name = 'SelectNextValidGun',
 	len = 0,
 }
@@ -1097,22 +1089,17 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'ActivateCopy',
-	len = 0,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'ActivateCut',
-	len = 0,
-}
-
-input_actions[#input_actions+1] = {
 	name = 'ActivatePaste',
 	len = 0,
 }
 
 input_actions[#input_actions+1] = {
 	name = 'Undo',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'Redo',
 	len = 0,
 }
 
@@ -1137,7 +1124,12 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'StopBuildingByMoving',
+	name = 'ToggleArtilleryAutoTargeting',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'StopDragBuild',
 	len = 0,
 }
 
@@ -1152,8 +1144,55 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'OpenTipsAndTricksGui',
-	len = 4,
+	name = 'AddLogisticSection',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'AcknowledgeTechnology',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'OpenOpenedEntityGrid',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'FinishedButContinuing',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ContinueSinglePlayer',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'OpenNewPlatformButtonFromRocketSilo',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ToggleSelectedEntity',
+	len = 0,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'Cheat',
+	len = 0,
+}
+
+
+-- Input actions with data
+
+
+input_actions[#input_actions+1] = {
+	name = 'CloseGui',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'OpenLogisticsGui',
 }
 
 input_actions[#input_actions+1] = {
@@ -1178,7 +1217,7 @@ input_actions[#input_actions+1] = {
 
 input_actions[#input_actions+1] = {
 	name = 'StartWalking',
-	len = 1,
+	len = 16,
 }
 
 input_actions[#input_actions+1] = {
@@ -1192,6 +1231,11 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'ChangeHeadingRidingState',
+	len = 2,
+}
+
+input_actions[#input_actions+1] = {
 	name = 'OpenItem',
 	len = 5,
 }
@@ -1199,11 +1243,6 @@ input_actions[#input_actions+1] = {
 input_actions[#input_actions+1] = {
 	name = 'OpenParentOfOpenedItem',
 	len = 2,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'ResetItem',
-	len = 5,
 }
 
 input_actions[#input_actions+1] = {
@@ -1236,21 +1275,29 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'SendStackToTrash',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SendStacksToTrash',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'InventoryTransfer',
 	len = 5,
 }
 
 -- ActionData::CrcData
 pf.crc_data_crc         = ProtoField.uint32("fgp.input_action.crc_data.crc", "crc", base.DEC, nil, 0)
-pf.crc_data_tick_of_crc = ProtoField.uint32("fgp.input_action.crc_data.tick_of_crc", "tickOfCrc",base.DEC, nil, 0)
+pf.crc_data_tick_of_crc = ProtoField.uint64("fgp.input_action.crc_data.tick_of_crc", "tickOfCrc",base.DEC, nil, 0)
 
 input_actions[#input_actions+1] = {
 	name = 'CheckCRCHeuristic',
 	dissect = function(pos, tvbuf, pktinfo, tree)
 		tree:add_le(pf.crc_data_crc, tvbuf:range(pos, 4))
 		pos = pos + 4
-		tree:add_le(pf.crc_data_tick_of_crc, tvbuf:range(pos, 4))
-		pos = pos + 4
+		tree:add_le(pf.crc_data_tick_of_crc, tvbuf:range(pos, 8))
+		pos = pos + 8
 
 		return pos
 	end
@@ -1281,7 +1328,7 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'SmartPipette',
+	name = 'Pipette',
 }
 
 input_actions[#input_actions+1] = {
@@ -1303,6 +1350,10 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'SetSpoilPriority',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'CheckCRC',
 	len = 9,
 }
@@ -1320,11 +1371,15 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'SetCheatModeQuality',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'SetLogisticFilterItem',
 }
 
 input_actions[#input_actions+1] = {
-	name = 'SetLogisticFilterSignal',
+	name = 'SwapLogisticFilterItems',
 	len = 1,
 }
 
@@ -1351,11 +1406,6 @@ input_actions[#input_actions+1] = {
 
 input_actions[#input_actions+1] = {
 	name = 'MarketOffer',
-	len = 9,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'AddTrainStation',
 	len = 9,
 }
 
@@ -1438,17 +1488,21 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'UseArtilleryRemote',
-	len = 8,
-}
-
-input_actions[#input_actions+1] = {
 	name = 'SetInventoryBar',
 	len = 6,
 }
 
 input_actions[#input_actions+1] = {
-	name = 'MoveOnZoom',
+	name = 'SetZoom',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ZoomAroundPoint',
+	len = 24,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'MoveOnPan',
 }
 
 input_actions[#input_actions+1] = {
@@ -1495,6 +1549,10 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'CopyLargeOpenedBlueprint',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'ReassignBlueprint',
 }
 
@@ -1534,7 +1592,7 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'SpawnItemStackTransfer',
+	name = 'SetGhostCursor',
 }
 
 input_actions[#input_actions+1] = {
@@ -1614,7 +1672,39 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'ChangeDeciderCombinatorParameters',
+	name = 'DragDeciderCombinatorCondition',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'AddDeciderCombinatorCondition',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ModifyDeciderCombinatorCondition',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RemoveDeciderCombinatorCondition',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'DragDeciderCombinatorOutput',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'AddDeciderCombinatorOutput',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ModifyDeciderCombinatorOutput',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RemoveDeciderCombinatorOutput',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ChangeSelectorCombinatorParameters',
 }
 
 input_actions[#input_actions+1] = {
@@ -1656,6 +1746,46 @@ input_actions[#input_actions+1] = {
 
 input_actions[#input_actions+1] = {
 	name = 'ChangeTrainWaitConditionData',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RemoveTrainStation',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RemoveTrainInterrupt',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'AddTrainStation',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'AddTrainInterrupt',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ActivateInterrupt',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'EditInterrupt',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RenameInterrupt',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'GoToTrainStation',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetTrainStopped',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetScheduleRecordAllowUnloading',
 }
 
 -- ActionData::CustomInputData
@@ -1706,7 +1836,7 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'ChangeItemDescription',
+	name = 'ChangeEntityLabel',
 	dissect = function(pos, tvbuf, pktinfo, tree)
 		pos = decode_string(pos, tvbuf, tree, "string", "input_action_string")
 		return pos
@@ -1714,11 +1844,23 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'ChangeEntityLabel',
-	dissect = function(pos, tvbuf, pktinfo, tree)
-		pos = decode_string(pos, tvbuf, tree, "string", "input_action_string")
-		return pos
-	end,
+	name = 'ChangeTrainName',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ChangeLogisticPointGroup',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'LaunchRocket',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'DeleteLogisticGroup',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetLogisticNetworkName',
 }
 
 input_actions[#input_actions+1] = {
@@ -1728,6 +1870,10 @@ input_actions[#input_actions+1] = {
 input_actions[#input_actions+1] = {
 	name = 'CancelResearch',
 	len = 12,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'MoveResearch',
 }
 
 input_actions[#input_actions+1] = {
@@ -1743,20 +1889,20 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'AltReverseSelectArea',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'ServerCommand',
 	len = 4,
 }
 
 input_actions[#input_actions+1] = {
-	name = 'SetControllerLogisticTrashFilterItem',
-}
-
-input_actions[#input_actions+1] = {
-	name = 'SetEntityLogisticTrashFilterItem',
-}
-
-input_actions[#input_actions+1] = {
 	name = 'SetInfinityContainerFilterItem',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SwapInfinityContainerFilterItems',
 }
 
 input_actions[#input_actions+1] = {
@@ -1823,13 +1969,20 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'DragTrainScheduleInterrupt',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'DragTrainWaitCondition',
 	len = 2,
 }
 
 input_actions[#input_actions+1] = {
-	name = 'SelectItem',
-	len = 4,
+	name = 'SelectItemFilter',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SwapItemFilters',
 }
 
 input_actions[#input_actions+1] = {
@@ -1838,11 +1991,43 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'SwapEntitySlots',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SelectEntityFilterSlot',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SwapEntityFilterSlots',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SelectAsteroidChunkSlot',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SwapAsteroidChunkSlots',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'SelectTileSlot',
 }
 
 input_actions[#input_actions+1] = {
-	name = 'SelectMapperSlot',
+	name = 'SwapTileSlots',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SelectMapperSlotFrom',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SelectMapperSlotTo',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SwapMappers',
 }
 
 input_actions[#input_actions+1] = {
@@ -1900,13 +2085,45 @@ pf.translation_result_data_translated = ProtoField.bool("fgp.input_action.transl
 input_actions[#input_actions+1] = {
 	name = 'TranslateString',
 	dissect = function(pos, tvbuf, pktinfo, tree)
-        pos = decode_localized_string(pos, tvbuf, tree, "localized_string")
+		pos = decode_localized_string(pos, tvbuf, tree, "localized_string")
 		pos = decode_string(pos, tvbuf, tree, "result", "translation_result_data_result")
 
-        tree:add(pf.translation_result_data_translated, tvbuf:range(pos, 1))
-        pos = pos + 1
+		tree:add(pf.translation_result_data_translated, tvbuf:range(pos, 1))
+		pos = pos + 1
 		return pos
 	end,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'CreateSpacePlatform',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'DeleteSpacePlatform',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'CancelDeleteSpacePlatform',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RenameSpacePlatform',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RemoteViewSurface',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RemoteViewEntity',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'CloseRemoteView',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'InstantlyCreateSpacePlatform',
 }
 
 input_actions[#input_actions+1] = {
@@ -1935,27 +2152,11 @@ input_actions[#input_actions+1] = {
 
 input_actions[#input_actions+1] = {
 	name = 'SelectedEntityChangedBasedOnUnitNumber',
-	len = 4,
+	len = 8,
 }
 
 input_actions[#input_actions+1] = {
-	name = 'SetAutosortInventory',
-	len = 1,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'SetFlatControllerGui',
-	len = 1,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'SetRecipeNotifications',
-	len = 1,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'SetAutoLaunchRocket',
-	len = 1,
+	name = 'SetCombinatorDescription',
 }
 
 input_actions[#input_actions+1] = {
@@ -1971,6 +2172,18 @@ input_actions[#input_actions+1] = {
 input_actions[#input_actions+1] = {
 	name = 'SwitchInserterFilterModeState',
 	len = 1,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetUseInserterFilters',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SwitchLoaderFilterMode',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SwitchMiningDrillFilterModeState',
 }
 
 input_actions[#input_actions+1] = {
@@ -1994,18 +2207,20 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'FlipEntity',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'FastEntitySplit',
 	len = 1,
 }
 
 input_actions[#input_actions+1] = {
-	name = 'SetTrainStopped',
-	len = 1,
+	name = 'RequestMissingConstructionMaterials',
 }
 
 input_actions[#input_actions+1] = {
-	name = 'ChangeControllerSpeed',
-	len = 8,
+	name = 'TrashNotRequestedItems',
 }
 
 input_actions[#input_actions+1] = {
@@ -2024,13 +2239,25 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
+	name = 'SetLoaderBeltStackSizeOverride',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'OpenTrainGui',
 	len = 4,
 }
 
 input_actions[#input_actions+1] = {
+	name = 'OpenTrainsGui',
+}
+
+input_actions[#input_actions+1] = {
 	name = 'SetEntityColor',
 	len = 4,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetCopyColorFromTrainStop',
 }
 
 input_actions[#input_actions+1] = {
@@ -2114,17 +2341,12 @@ input_actions[#input_actions+1] = {
 }
 
 input_actions[#input_actions+1] = {
-	name = 'RemoveTrainStation',
-	len = 4,
-}
-
-input_actions[#input_actions+1] = {
-	name = 'GoToTrainStation',
-	len = 4,
-}
-
-input_actions[#input_actions+1] = {
 	name = 'RenderModeChanged',
+	len = 1,
+}
+
+input_actions[#input_actions+1] = {
+	name = 'PlayerInputMethodChanged',
 	len = 1,
 }
 
@@ -2151,6 +2373,147 @@ input_actions[#input_actions+1] = {
 	len = 4,
 }
 
+input_actions[#input_actions+1] = {
+	name = 'SetTurretIgnoreUnlisted',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetLampAlwaysOn',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'OpenGlobalElectricNetworkGui',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetPumpFluidFilter',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'CustomTestInputAction',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RemoveLogisticSection',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'EditDisplayPanel',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'EditDisplayPanelAlwaysShow',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'EditDisplayPanelShowInChart',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'EditDisplayPanelIcon',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'EditDisplayPanelParameters',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'EditDisplayPanelSingleEntry',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ReorderLogisticSection',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetLogisticSectionActive',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'AddPin',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'PinSearchResult',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'PinAlertGroup',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'PinCustomAlert',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'EditPin',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'RemovePin',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'MovePin',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SendTrainToPinTarget',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'GuiHover',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'GuiLeave',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'UpdatePlayerSettings',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SpectatorChangeSurface',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'AdjustBlueprintSnapping',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetTrainStopPriority',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'AchievementGained',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'LandAtPlanet',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'PlayerVisitedPlanet',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'ParametriseBlueprint',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'PlayerLocaleChanged',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'SetRocketSiloSendToOrbitAutomatedMode',
+}
+
+input_actions[#input_actions+1] = {
+	name = 'UdpPacketReceived',
+}
+
+
 local InputActionType = {}
 local InputActionTypeEnum = {}
 for id, data in pairs(input_actions) do
@@ -2159,17 +2522,16 @@ for id, data in pairs(input_actions) do
 end
 
 pf.input_actions_size = ProtoField.uint8("fgp.tick_closure.input_actions.size", "size", base.DEC, nil, 0)
-pf.input_action_type         = ProtoField.uint8("fgp.input_action.type", "type", base.HEX, InputActionType, 0)
+pf.input_action_type         = ProtoField.uint16("fgp.input_action.type", "type", base.HEX, InputActionType, 0)
 pf.input_action_player_index = ProtoField.uint16("fgp.input_action.player_index", "playerIndex", base.DEC, nil, 0)
 pf.input_action_data         = ProtoField.bytes("fgp.input_action.data", "data", base.SPACE)
 
 
 function dissect_input_action(pos, tvbuf, pktinfo, tree, last_index)
 	local input_start_pos = pos
-	local input_type = tvbuf:range(pos, 1):uint()
 	local input_tree = tree:add(tvbuf:range(pos), "InputAction")
-	input_tree:add(pf.input_action_type, tvbuf:range(pos, 1))
-	pos = pos + 1
+	pos, input_type_range, input_type = decode_uint16v(pos, tvbuf)
+	input_tree:add(pf.input_action_type, input_type_range, input_type)
 
 	local pi_delta_range, pi_delta_value
 	pos, pi_delta_range, pi_delta_value = decode_uint16v(pos, tvbuf)
@@ -2322,7 +2684,7 @@ synchronizer_actions[0x03] = {
 
 synchronizer_actions[0x04] = {
 	name = 'ClientShouldStartSendingTickClosures',
-	len = 4,
+	len = 8,
 }
 
 
@@ -2502,9 +2864,10 @@ GameActionType = {
 	[172] = 'EntityLogisticSlotChanged',
 }
 
-pf.monster_goblin  = ProtoField.uint32("fgp.map_ready.size", "size", base.DEC, nil, 0)
+pf.monster_goblin  = ProtoField.uint64("fgp.map_ready.size", "size", base.DEC, nil, 0)
+pf.monster_goblin2 = ProtoField.uint64("fgb.map_ready.auxiliary_size", "auxiliarySize", base.Dec, nil, 0)
 pf.monster_zombie  = ProtoField.uint32("fgp.map_ready.crc", "crc", base.DEC, nil, 0)
-pf.monster_tick    = ProtoField.uint32("fgp.map_ready.update_tick", "updateTick", base.DEC, nil, 0)
+pf.monster_tick    = ProtoField.uint64("fgp.map_ready.update_tick", "updateTick", base.DEC, nil, 0)
 pf.monster_hydra   = ProtoField.uint32("fgp.map_ready.autosave_interval", "autosaveInterval", base.DEC, nil, 0)
 pf.monster_gryphon = ProtoField.uint32("fgp.map_ready.autosave_slots", "autosaveSlots", base.DEC, nil, 0)
 pf.monster_gnome   =  ProtoField.uint8("fgp.map_ready.autosave_only_on_server", "autosaveOnlyOnServer", base.DEC, nil, 0)
@@ -2546,12 +2909,14 @@ synchronizer_actions[0x05] = {
 
 		local monster_start_pos = pos
 
-		tree:add_le(pf.monster_goblin, tvbuf:range(pos, 4))
-		pos = pos + 4
+		tree:add_le(pf.monster_goblin, tvbuf:range(pos, 8))
+		pos = pos + 8
+		tree:add_le(pf.monster_goblin2, tvbuf:range(pos, 8))
+		pos = pos + 8
 		tree:add_le(pf.monster_zombie, tvbuf:range(pos, 4))
 		pos = pos + 4
-		tree:add_le(pf.monster_tick, tvbuf:range(pos, 4))
-		pos = pos + 4
+		tree:add_le(pf.monster_tick, tvbuf:range(pos, 8))
+		pos = pos + 8
 		tree:add_le(pf.monster_hydra, tvbuf:range(pos, 4))
 		pos = pos + 4
 		tree:add_le(pf.monster_gryphon, tvbuf:range(pos, 4))

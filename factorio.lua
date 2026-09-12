@@ -477,11 +477,12 @@ function dissect_connection_request_reply_confirm(pos, tvbuf, pktinf, tree)
 	tree:add_le(pf.connection_confirm_prototype_list_checksum, tvbuf:range(pos, 4))
 	pos = pos + 4
 
-	local mods_size = tvbuf:range(pos, 1):uint()
 	local mods_start_pos = pos
 	local mods_tree = tree:add(tvbuf:range(pos), "activeMods")
-	mods_tree:add(pf.connection_confirm_active_mods_size, tvbuf:range(pos, 1))
-	pos = pos + 1
+
+	local mods_size
+	pos, mod_size_range, mods_size = decode_uint32v(pos, tvbuf)
+	mods_tree:add(pf.connection_confirm_active_mods_size, mod_size_range, mods_size)
 
 	for _=1, mods_size do
 		pos = dissect_mod_id(pos, tvbuf, pktinfo, mods_tree)
@@ -678,11 +679,12 @@ function dissect_connection_accept_or_deny(pos, tvbuf, pktinf, tree)
 	tree:add_le(pf.connection_accept_new_peer_id, tvbuf:range(pos, 2))
 	pos = pos + 2
 
-	local mods_size = tvbuf:range(pos, 1):uint()
 	local mods_start_pos = pos
 	local mods_tree = tree:add(tvbuf:range(pos), "activeMods")
-	mods_tree:add(pf.connection_accept_active_mods_size, tvbuf:range(pos, 1))
-	pos = pos + 1
+
+	local mods_size
+	pos, mod_size_range, mods_size = decode_uint32v(pos, tvbuf)
+	mods_tree:add(pf.connection_accept_active_mods_size, mod_size_range, mods_size)
 
 	for _=1, mods_size do
 		pos = dissect_mod_id(pos, tvbuf, pktinfo, mods_tree)
